@@ -1,0 +1,2 @@
+import { Skeleton } from "@/components/ui/Skeleton";
+export default function MedicinesLoading() { return <div><Skeleton className="h-12 w-64" /><Skeleton className="mt-3 h-7 w-96 max-w-full" /><div className="mt-8 space-y-6">{[1,2,3].map((item) => <div key={item} className="surface p-6"><div className="flex gap-4"><Skeleton className="h-20 w-20 shrink-0" /><div className="flex-1"><Skeleton className="h-8 w-48" /><Skeleton className="mt-3 h-5 w-64 max-w-full" /></div></div><Skeleton className="mt-6 h-3 w-full" /><Skeleton className="mt-6 h-14 w-full" /></div>)}</div></div>; }

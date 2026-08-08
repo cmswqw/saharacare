@@ -1,0 +1,2 @@
+import { Skeleton } from "@/components/ui/Skeleton";
+export default function CaregiverLoading() { return <div className="space-y-7"><Skeleton className="h-12 w-80 max-w-full" /><Skeleton className="h-44 w-full" /><div className="grid gap-4 sm:grid-cols-3"><Skeleton className="h-28" /><Skeleton className="h-28" /><Skeleton className="h-28" /></div><div className="grid gap-6 lg:grid-cols-2"><Skeleton className="h-80" /><Skeleton className="h-80" /></div></div>; }

@@ -1,0 +1,2 @@
+import { Skeleton } from "@/components/ui/Skeleton";
+export default function AppointmentsLoading() { return <div className="space-y-8"><Skeleton className="h-12 w-72" /><div className="grid gap-4 md:grid-cols-2"><Skeleton className="h-28" /><Skeleton className="h-28" /><Skeleton className="h-28" /><Skeleton className="h-28" /></div><Skeleton className="h-44 w-full" /><Skeleton className="h-64 w-full" /></div>; }

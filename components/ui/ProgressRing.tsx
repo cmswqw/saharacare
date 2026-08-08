@@ -1,0 +1,4 @@
+export function ProgressRing({ value, label }: { value: number | null; label: string }) {
+  const radius = 51; const circumference = 2 * Math.PI * radius; const safeValue = value ?? 0; const offset = circumference - (safeValue / 100) * circumference;
+  return <div className="relative grid h-36 w-36 place-items-center" role="img" aria-label={value === null ? `${label}: no eligible doses` : `${label}: ${value}%`}><svg className="h-full w-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r={radius} fill="none" stroke="currentColor" strokeWidth="10" className="text-slate-200 dark:text-slate-700" /><circle cx="60" cy="60" r={radius} fill="none" stroke="#2563EB" strokeWidth="10" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} /></svg><span className="absolute text-3xl font-extrabold">{value === null ? "—" : `${value}%`}</span></div>;
+}

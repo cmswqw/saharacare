@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 248 250 252;
+  --foreground: 17 24 39;
+  --card: 255 255 255;
+  --muted: 75 85 99;
+  --border: 226 232 240;
+  --patient-text: 18px;
+}
+
+.dark {
+  --background: 11 18 32;
+  --foreground: 241 245 249;
+  --card: 23 33 51;
+  --muted: 174 185 201;
+  --border: 55 65 81;
+}
+
+.contrast {
+  --background: 255 255 255;
+  --foreground: 0 0 0;
+  --card: 255 255 255;
+  --muted: 31 41 55;
+  --border: 0 0 0;
+}
+
+* { border-color: rgb(var(--border)); }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: var(--font-sans), var(--font-devanagari), system-ui, sans-serif;
+}
+
+button, a, input, select, textarea { outline: none; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3);
+}
+
+.patient-ui { font-size: var(--patient-text); }
+.text-size-normal { --patient-text: 18px; }
+.text-size-large { --patient-text: 20px; }
+.text-size-extra { --patient-text: 22px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+
+@layer components {
+  .surface { @apply rounded-3xl border bg-card shadow-soft; }
+  .patient-heading { @apply text-3xl font-bold tracking-tight md:text-4xl; }
+  .section-title { @apply text-2xl font-bold tracking-tight; }
+  .eyebrow { @apply text-base font-bold uppercase tracking-[0.12em] text-primary; }
+  .touch-target { @apply min-h-16; }
+  .safe-bottom { padding-bottom: max(6.5rem, env(safe-area-inset-bottom)); }
+}
