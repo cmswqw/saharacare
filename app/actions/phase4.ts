@@ -14,6 +14,25 @@ function actionResult(
   return { status, message, nonce: Date.now() };
 }
 
+function medicationMutationErrorMessage(error: {
+  code?: string;
+  message?: string;
+}) {
+  if (error.code === "42702") {
+    return "The medication save function needs the latest database migration.";
+  }
+  if (error.code === "PGRST202") {
+    return "The medication save function is not installed in Supabase.";
+  }
+  if (error.code === "22023" && error.message) {
+    return error.message;
+  }
+  if (error.code === "42501") {
+    return "Your signed-in patient account is not authorized to save this medication.";
+  }
+  return "The medication could not be saved. Please try again.";
+}
+
 async function getActionActor(expectedRole?: UserRole) {
   const supabase = await createClient();
   const {
@@ -167,7 +186,7 @@ export async function saveMedicationAction(
     return actionResult("error", "Choose at least one day of the week.");
   }
 
-  const { error } = await context.supabase.rpc("save_patient_medication", {
+  const { data: savedMedicationId, error } = await context.supabase.rpc("save_patient_medication", {
     medication_id: medicationId,
     medication_name: name,
     medication_dosage: dosage,
@@ -178,7 +197,20 @@ export async function saveMedicationAction(
   });
 
   if (error) {
-    return actionResult("error", "The medication could not be saved. Please try again.");
+    console.error("save_patient_medication RPC failed", {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+    return actionResult("error", medicationMutationErrorMessage(error));
+  }
+
+  if (typeof savedMedicationId !== "string" || !uuidPattern.test(savedMedicationId)) {
+    console.error("save_patient_medication RPC returned an invalid medication id", {
+      savedMedicationId,
+    });
+    return actionResult("error", "Supabase did not confirm the medication save.");
   }
 
   revalidatePath("/patient");
