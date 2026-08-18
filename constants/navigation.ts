@@ -1,16 +1,24 @@
-import { Bell, CalendarDays, HeartPulse, Home, Pill, Settings, UserRound } from "lucide-react";
+import { Bell, Bot, CalendarDays, FileHeart, HeartPulse, Home, Pill, Settings, UserRound } from "lucide-react";
 
 export const patientNavigation = [
   { href: "/patient", label: "home" as const, icon: Home },
   { href: "/patient/medicines", label: "medicines" as const, icon: Pill },
+  { href: "/patient/medical-information", label: "medicalInfo" as const, icon: FileHeart },
+  { href: "/patient/assistant", label: "assistant" as const, icon: Bot },
   { href: "/patient/appointments", label: "appointments" as const, icon: CalendarDays },
   { href: "/patient/profile", label: "profile" as const, icon: UserRound },
 ];
 
 export const caregiverNavigation = [
-  { href: "/caregiver", label: "Overview", icon: Home },
-  { href: "/caregiver/notifications", label: "Notifications", icon: Bell },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/caregiver", label: "patientOverview" as const, icon: Home },
+  { href: "/caregiver/assistant", label: "assistant" as const, icon: Bot },
+  { href: "/caregiver/notifications", label: "notifications" as const, icon: Bell },
+  { href: "/settings", label: "settings" as const, icon: Settings },
+];
+
+export const doctorNavigation = [
+  { href: "/doctor", label: "appointments" as const, icon: CalendarDays },
+  { href: "/settings", label: "settings" as const, icon: Settings },
 ];
 
 export const brandIcon = HeartPulse;

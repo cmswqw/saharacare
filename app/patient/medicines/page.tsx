@@ -6,7 +6,7 @@ export default async function MedicinesPage() {
   const result = await getOwnMedications();
 
   if (result.error) {
-    return <DataErrorState message="Your medication plan is temporarily unavailable. Confirm that the Phase 4 migration has been applied." />;
+    return <DataErrorState messageKey="medicationPlanError" />;
   }
 
   return <MedicationManager medications={result.data} />;

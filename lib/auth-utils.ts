@@ -1,5 +1,7 @@
 import type { UserRole } from "@/types";
 
 export function dashboardPath(role: UserRole) {
-  return role === "caregiver" ? "/caregiver" : "/patient";
+  if (role === "caregiver") return "/caregiver";
+  if (role === "doctor") return "/doctor";
+  return "/patient";
 }

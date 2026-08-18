@@ -20,7 +20,7 @@ export default async function PatientHomePage() {
     || !linkingResult.data.linkingCode
   ) {
     return (
-      <DataErrorState message="Today’s dose information could not be loaded. Confirm that the Phase 5 database migration has been applied." />
+      <DataErrorState messageKey="todayDoseError" />
     );
   }
 

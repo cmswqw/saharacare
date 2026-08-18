@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 import { HeartPulse, UserRound } from "lucide-react";
 import { caregiverNavigation } from "@/constants/navigation";
 import { useCurrentUser } from "@/components/providers/CurrentUserProvider";
+import { useApp } from "@/components/providers/AppProvider";
 import { cn } from "@/lib/utils";
 
 export function CaregiverSidebar() {
   const pathname = usePathname();
   const profile = useCurrentUser();
+  const { t } = useApp();
 
   return (
     <aside className="fixed inset-y-0 start-0 z-40 hidden w-72 border-e bg-slate-950 p-5 text-white lg:flex lg:flex-col">
@@ -17,7 +19,7 @@ export function CaregiverSidebar() {
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary"><HeartPulse /></span>
         <span className="text-2xl font-extrabold">SaharaCare</span>
       </Link>
-      <p className="mb-4 px-4 text-sm font-bold uppercase tracking-widest text-slate-400">Caregiver view</p>
+      <p className="mb-4 px-4 text-sm font-bold uppercase tracking-widest text-slate-400">{t("caregiverView")}</p>
       <nav className="space-y-2">
         {caregiverNavigation.map(({ href, label, icon: Icon }) => {
           const active = href === "/caregiver" ? pathname === href : pathname.startsWith(href);
@@ -31,7 +33,7 @@ export function CaregiverSidebar() {
               )}
             >
               <Icon aria-hidden="true" />
-              {label}
+              {t(label)}
             </Link>
           );
         })}
@@ -41,7 +43,7 @@ export function CaregiverSidebar() {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-slate-800 text-blue-300"><UserRound /></span>
           <div className="min-w-0">
             <p className="truncate font-extrabold">{profile.full_name}</p>
-            <p className="text-sm font-semibold text-slate-400">Authenticated caregiver</p>
+            <p className="text-sm font-semibold text-slate-400">{t("authenticatedCaregiver")}</p>
           </div>
         </div>
       </div>

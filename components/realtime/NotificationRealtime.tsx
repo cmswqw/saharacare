@@ -14,7 +14,7 @@ type NotificationPayload = {
 export function NotificationRealtime({ userId }: { userId: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { toast } = useApp();
+  const { t, toast } = useApp();
   const seenEventRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -56,14 +56,14 @@ export function NotificationRealtime({ userId }: { userId: string }) {
       )
       .subscribe((status) => {
         if (!active || status !== "CHANNEL_ERROR") return;
-        toast("Live notification updates are temporarily unavailable.", "warning");
+        toast(t("liveNotificationsUnavailable"), "warning");
       });
 
     return () => {
       active = false;
       void supabase.removeChannel(channel);
     };
-  }, [pathname, router, toast, userId]);
+  }, [pathname, router, t, toast, userId]);
 
   return null;
 }

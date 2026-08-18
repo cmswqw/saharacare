@@ -2,10 +2,11 @@ import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { getAuthContext } from "@/lib/auth";
 import { dashboardPath } from "@/lib/auth-utils";
+import type { TranslationKey } from "@/lib/i18n";
 
-const errorMessages: Record<string, string> = {
-  confirmation: "The email confirmation link is invalid or has expired. Request a new signup email or try signing in.",
-  profile: "Your authentication succeeded, but your SaharaCare profile is missing. Sign out and contact the project administrator.",
+const errorMessages: Record<string, TranslationKey> = {
+  confirmation: "authConfirmationError",
+  profile: "authProfileError",
 };
 
 export default async function LoginPage({
@@ -24,7 +25,7 @@ export default async function LoginPage({
   return (
     <AuthForm
       mode="login"
-      initialMessage={error ? errorMessages[error] ?? "Authentication could not be completed." : undefined}
+      initialMessageKey={error ? errorMessages[error] ?? "authCouldNotComplete" : undefined}
     />
   );
 }

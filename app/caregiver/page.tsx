@@ -4,6 +4,7 @@ import { CaregiverConnectCard } from "@/components/linking/CaregiverConnectCard"
 import { CaregiverDoseRealtime } from "@/components/realtime/CaregiverDoseRealtime";
 import { Card } from "@/components/ui/Card";
 import { DataErrorState } from "@/components/ui/DataState";
+import { TranslatedText } from "@/components/ui/TranslatedText";
 import { requireRole } from "@/lib/auth";
 import { getCaregiverPatients } from "@/lib/data/phase4";
 
@@ -14,7 +15,7 @@ export default async function CaregiverPage() {
   ]);
 
   if (result.error) {
-    return <DataErrorState message="Linked patient information is temporarily unavailable. Confirm that the Phase 4 migration has been applied." />;
+    return <DataErrorState messageKey="linkedPatientsError" />;
   }
 
   const acceptedPatients = result.data.filter((patient) => patient.status === "accepted");
@@ -36,9 +37,9 @@ export default async function CaregiverPage() {
     <div className="space-y-8">
       <CaregiverDoseRealtime patients={realtimePatients} />
       <header>
-        <p className="eyebrow">Caregiver overview</p>
-        <h1 className="mt-2 text-4xl font-extrabold tracking-tight">Good morning, {profile.full_name}</h1>
-        <p className="mt-3 text-lg text-muted">View today’s dose status for approved patients. Dose changes update live.</p>
+        <p className="eyebrow"><TranslatedText translationKey="caregiverOverview" /></p>
+        <h1 className="mt-2 text-4xl font-extrabold tracking-tight"><TranslatedText translationKey="greetingName" values={{ name: profile.full_name }} /></h1>
+        <p className="mt-3 text-lg text-muted"><TranslatedText translationKey="caregiverDashboardIntro" /></p>
       </header>
 
       <CaregiverConnectCard links={result.data} />
@@ -46,12 +47,12 @@ export default async function CaregiverPage() {
       <section>
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="eyebrow">People you care for</p>
-            <h2 className="section-title mt-1">Linked patients</h2>
+            <p className="eyebrow"><TranslatedText translationKey="peopleYouCareFor" /></p>
+            <h2 className="section-title mt-1"><TranslatedText translationKey="linkedPatients" /></h2>
           </div>
           {pendingCount > 0 ? (
             <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-2 font-bold text-amber-900 dark:bg-amber-950/30 dark:text-amber-100">
-              <Clock3 />{pendingCount} pending
+              <Clock3 /><TranslatedText translationKey="pendingCount" values={{ count: pendingCount }} />
             </span>
           ) : null}
         </div>
@@ -59,9 +60,9 @@ export default async function CaregiverPage() {
         {acceptedPatients.length === 0 ? (
           <Card className="border-dashed p-8 text-center">
             <ShieldCheck className="mx-auto h-14 w-14 text-primary" />
-            <h3 className="mt-4 text-2xl font-extrabold">No approved patients yet</h3>
+            <h3 className="mt-4 text-2xl font-extrabold"><TranslatedText translationKey="noApprovedPatients" /></h3>
             <p className="mx-auto mt-2 max-w-xl leading-relaxed text-muted">
-              Enter a patient’s code above. Medication information appears only after that patient approves the request.
+              <TranslatedText translationKey="noApprovedPatientsHelp" />
             </p>
           </Card>
         ) : (

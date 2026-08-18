@@ -56,18 +56,18 @@ export default function SettingsPage() {
 
   async function testBrowserNotification() {
     if (!("Notification" in window)) {
-      app.toast("Browser notifications are unavailable here.", "warning");
+      app.toast(app.t("browserNotificationsUnavailable"), "warning");
       return;
     }
 
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      new Notification("SaharaCare demo", { body: "Sample reminder preview." });
+      new Notification("SaharaCare", { body: app.t("sampleReminderPreview") });
     }
     app.toast(
       permission === "granted"
-        ? "Sample browser notification sent."
-        : "Notification permission was not granted.",
+        ? app.t("sampleNotificationSent")
+        : app.t("notificationPermissionDenied"),
       permission === "granted" ? "success" : "warning",
     );
   }
@@ -76,15 +76,15 @@ export default function SettingsPage() {
     <main className="min-h-screen bg-background px-4 py-6 md:px-8 md:py-10">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between gap-3">
-          <Link href={profile.role === "caregiver" ? "/caregiver" : "/patient"} className="grid h-12 w-12 place-items-center rounded-2xl border bg-card" aria-label="Back"><ArrowLeft /></Link>
+          <Link href={profile.role === "caregiver" ? "/caregiver" : profile.role === "doctor" ? "/doctor" : "/patient"} className="grid h-12 w-12 place-items-center rounded-2xl border bg-card" aria-label={app.t("back")}><ArrowLeft /></Link>
           <p className="font-extrabold text-primary">SaharaCare</p>
-          <span className="text-sm font-bold text-muted">Settings</span>
+          <span className="text-sm font-bold text-muted">{app.t("settings")}</span>
         </div>
 
         <header className="mt-10">
-          <p className="eyebrow">Comfort & reminders</p>
+          <p className="eyebrow">{app.t("comfortReminders")}</p>
           <h1 className="patient-heading mt-2">{app.t("settings")}</h1>
-          <p className="mt-3 text-lg text-muted">Choose what feels easiest to see and use.</p>
+          <p className="mt-3 text-lg text-muted">{app.t("settingsIntro")}</p>
         </header>
 
         <div className="mt-8 space-y-6">
@@ -99,23 +99,23 @@ export default function SettingsPage() {
           </Card>
 
           <Card className="divide-y px-5 md:px-6">
-            <SettingRow icon={Moon} title={app.t("darkMode")} detail="Use a dark background in low light." control={<Toggle checked={app.darkMode} onChange={app.setDarkMode} label="Toggle dark mode" />} />
-            <SettingRow icon={Contrast} title={app.t("highContrast")} detail="Use stronger borders and text contrast." control={<Toggle checked={app.highContrast} onChange={app.setHighContrast} label="Toggle high contrast" />} />
-            <SettingRow icon={Smartphone} title={app.t("reducedMotion")} detail="Limit interface movement and animation." control={<Toggle checked={app.reducedMotion} onChange={app.setReducedMotion} label="Toggle reduced motion" />} />
+            <SettingRow icon={Moon} title={app.t("darkMode")} detail={app.t("darkModeHelp")} control={<Toggle checked={app.darkMode} onChange={app.setDarkMode} label={app.t("toggleDarkMode")} />} />
+            <SettingRow icon={Contrast} title={app.t("highContrast")} detail={app.t("highContrastHelp")} control={<Toggle checked={app.highContrast} onChange={app.setHighContrast} label={app.t("toggleHighContrast")} />} />
+            <SettingRow icon={Smartphone} title={app.t("reducedMotion")} detail={app.t("reducedMotionHelp")} control={<Toggle checked={app.reducedMotion} onChange={app.setReducedMotion} label={app.t("toggleReducedMotion")} />} />
           </Card>
 
           <Card className="p-5 md:p-6">
             <div className="flex items-center gap-3"><BellRing className="text-primary" /><h2 className="text-2xl font-extrabold">{app.t("reminderSettings")}</h2></div>
             <div className="mt-4 divide-y">
-              <SettingRow icon={BellRing} title="Medicine reminders" detail="Reminder automation is planned for a later phase." control={<Toggle checked onChange={() => app.toast("Reminder automation is not connected yet.")} label="Toggle medicine reminders" />} />
-              <SettingRow icon={Volume2} title={app.t("reminderSound")} detail="Optional soft sound preference." control={<Toggle checked={app.reminderSound} onChange={app.setReminderSound} label="Toggle reminder sound" />} />
+              <SettingRow icon={BellRing} title={app.t("medicineReminders")} detail={app.t("reminderAutomationPlanned")} control={<Toggle checked onChange={() => app.toast(app.t("reminderAutomationUnavailable"))} label={app.t("toggleMedicineReminders")} />} />
+              <SettingRow icon={Volume2} title={app.t("reminderSound")} detail={app.t("reminderSoundHelp")} control={<Toggle checked={app.reminderSound} onChange={app.setReminderSound} label={app.t("toggleReminderSound")} />} />
             </div>
-            <Button size="large" variant="secondary" className="mt-5" onClick={testBrowserNotification}>Allow sample browser notification</Button>
-            <p className="mt-4 text-sm leading-relaxed text-muted">Sample notification only. Medication reminder scheduling belongs to a later phase.</p>
+            <Button size="large" variant="secondary" className="mt-5" onClick={testBrowserNotification}>{app.t("allowSampleNotification")}</Button>
+            <p className="mt-4 text-sm leading-relaxed text-muted">{app.t("sampleNotificationHelp")}</p>
           </Card>
 
           <Card className="p-5 md:p-6">
-            <h2 className="text-2xl font-extrabold">Accessibility</h2>
+            <h2 className="text-2xl font-extrabold">{app.t("accessibility")}</h2>
             <div className="mt-5"><ReadAloudButton /></div>
           </Card>
 

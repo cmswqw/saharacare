@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, HeartPulse, UserRound, UsersRound } from "lucide-react";
+import { ArrowLeft, HeartPulse, Stethoscope, UserRound, UsersRound } from "lucide-react";
 import { motion } from "framer-motion";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { useApp } from "@/components/providers/AppProvider";
@@ -21,32 +21,41 @@ const choices = [
     Icon: UsersRound,
     color: "bg-green-50 text-green-700 dark:bg-green-950/40",
   },
+  {
+    href: "/signup?role=doctor",
+    key: "doctorRole" as const,
+    detail: "doctorRoleDetail" as const,
+    Icon: Stethoscope,
+    color: "bg-violet-50 text-violet-700 dark:bg-violet-950/40",
+  },
 ];
 
 export default function RolePage() {
   const { t } = useApp();
 
   return (
-    <main className="min-h-screen bg-background px-5 py-6">
+    <main className="min-h-screen overflow-x-hidden bg-background px-4 py-6 sm:px-5">
       <div className="mx-auto max-w-5xl">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="grid h-12 w-12 place-items-center rounded-2xl border bg-card" aria-label="Back">
+        <div className="grid grid-cols-[48px_1fr] items-center gap-3 sm:grid-cols-[48px_1fr_auto]">
+          <Link href="/" className="grid h-12 w-12 place-items-center rounded-2xl border bg-card" aria-label={t("back")}>
             <ArrowLeft />
           </Link>
-          <div className="flex items-center gap-2 font-extrabold">
+          <div className="flex items-center justify-self-center gap-2 font-extrabold">
             <HeartPulse className="text-primary" />
             SaharaCare
           </div>
-          <LanguageToggle />
+          <div className="col-span-2 justify-self-center sm:col-span-1 sm:justify-self-end">
+            <LanguageToggle />
+          </div>
         </div>
 
         <div className="mx-auto mt-14 max-w-2xl text-center">
-          <p className="eyebrow">One simple choice</p>
+          <p className="eyebrow">{t("oneSimpleChoice")}</p>
           <h1 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">{t("chooseRole")}</h1>
           <p className="mt-4 text-lg text-muted">{t("chooseRoleHelp")}</p>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {choices.map(({ href, key, detail, Icon, color }, index) => (
             <motion.div
               key={href}
@@ -54,26 +63,27 @@ export default function RolePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.08 }}
               whileHover={{ y: -4 }}
+              className="h-full"
             >
               <Link
                 href={href}
-                className="surface flex min-h-72 flex-col items-center justify-center p-8 text-center transition-shadow hover:shadow-xl"
+                className="surface grid h-[25rem] min-h-[25rem] w-full grid-rows-[96px_minmax(72px,auto)_1fr_auto] items-center justify-items-center p-8 text-center transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
               >
                 <span className={`grid h-24 w-24 place-items-center rounded-3xl ${color}`}>
                   <Icon className="h-14 w-14" />
                 </span>
-                <h2 className="mt-7 text-3xl font-extrabold">{t(key)}</h2>
-                <p className="mt-3 max-w-sm text-lg leading-relaxed text-muted">{t(detail)}</p>
-                <span className="mt-6 font-bold text-primary">Continue →</span>
+                <h2 className="mt-6 self-start text-3xl font-extrabold">{t(key)}</h2>
+                <p className="mt-3 max-w-sm self-start text-lg leading-relaxed text-muted">{t(detail)}</p>
+                <span className="mt-6 font-bold text-primary">{t("continue")} →</span>
               </Link>
             </motion.div>
           ))}
         </div>
 
         <p className="mt-8 text-center font-semibold text-muted">
-          Already have an account?{" "}
+          {t("alreadyHaveAccount")}{" "}
           <Link href="/login" className="font-extrabold text-primary hover:underline">
-            Sign in
+            {t("signIn")}
           </Link>
         </p>
       </div>

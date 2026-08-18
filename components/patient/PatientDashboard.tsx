@@ -46,9 +46,9 @@ export function PatientDashboard({
   return (
     <div className="space-y-8">
       <section>
-        <p className="eyebrow">{formatDoseDate(new Date().toISOString())}</p>
+        <p className="eyebrow">{formatDoseDate(new Date().toISOString(), language)}</p>
         <h1 className="patient-heading mt-2">
-          {language === "ne" ? `नमस्ते, ${profile.full_name}` : `Good morning, ${profile.full_name}`}
+          {t("greetingName", { name: profile.full_name })}
         </h1>
         <p className="mt-3 text-xl leading-relaxed text-muted">{t("greetingDetail")}</p>
       </section>
@@ -57,15 +57,15 @@ export function PatientDashboard({
         <CurrentMedicineCard dose={currentDose} />
       ) : activeMedications.length === 0 ? (
         <MedicationEmptyState>
-          <Button asChild><Link href="/patient/medicines"><Plus />Add medication</Link></Button>
+          <Button asChild><Link href="/patient/medicines"><Plus />{t("addMedication")}</Link></Button>
         </MedicationEmptyState>
       ) : (
         <Card className="border-green-200 bg-green-50 p-8 text-center dark:bg-green-950/20">
           <CalendarCheck2 className="mx-auto h-14 w-14 text-success" />
-          <h2 className="mt-4 text-2xl font-extrabold">No doses scheduled today</h2>
-          <p className="mt-2 text-muted">Your active medication plan has no times for this weekday.</p>
+          <h2 className="mt-4 text-2xl font-extrabold">{t("noDosesScheduledToday")}</h2>
+          <p className="mt-2 text-muted">{t("noWeekdayTimes")}</p>
           <Button asChild variant="secondary" className="mt-5">
-            <Link href="/patient/medicines">Manage plan</Link>
+            <Link href="/patient/medicines">{t("managePlan")}</Link>
           </Button>
         </Card>
       )}
@@ -74,10 +74,12 @@ export function PatientDashboard({
         <section>
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="eyebrow">{todayDoses.length} {todayDoses.length === 1 ? "dose" : "doses"}</p>
+              <p className="eyebrow">
+                {t(todayDoses.length === 1 ? "doseCountOne" : "doseCountMany", { count: todayDoses.length })}
+              </p>
               <h2 className="section-title mt-1">{t("todaysSchedule")}</h2>
             </div>
-            <Button asChild variant="secondary"><Link href="/patient/medicines">Manage plan</Link></Button>
+            <Button asChild variant="secondary"><Link href="/patient/medicines">{t("managePlan")}</Link></Button>
           </div>
           <TodayDoseTimeline doses={todayDoses} />
         </section>
@@ -93,7 +95,7 @@ export function PatientDashboard({
 
       <section>
         <div className="mb-5">
-          <p className="eyebrow">Latest updates</p>
+          <p className="eyebrow">{t("latestUpdates")}</p>
           <h2 className="section-title mt-1">{t("recentActivity")}</h2>
         </div>
         <Card className="divide-y p-2">
@@ -102,7 +104,7 @@ export function PatientDashboard({
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-100 text-primary">
                 <Activity />
               </span>
-              <p className="font-semibold">{activity}</p>
+              <p className="font-semibold">{t(activity)}</p>
             </div>
           ))}
         </Card>

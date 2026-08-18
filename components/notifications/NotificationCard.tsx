@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { formatDoseDate, formatDoseTimestamp } from "@/lib/dose-config";
 import { cn } from "@/lib/utils";
 import type { AppNotification, NotificationActionState } from "@/types";
+import { useApp } from "@/components/providers/AppProvider";
 
 const initialState: NotificationActionState = { status: "idle", message: "" };
 
@@ -17,6 +18,7 @@ const icons = {
 };
 
 export function NotificationCard({ notification }: { notification: AppNotification }) {
+  const { language, t } = useApp();
   const [state, action, pending] = useActionState(markNotificationReadAction, initialState);
   const Icon = icons[notification.type];
 
@@ -32,23 +34,23 @@ export function NotificationCard({ notification }: { notification: AppNotificati
         <div className="flex flex-wrap items-start justify-between gap-2">
           <h3 className="text-lg font-extrabold">{notification.title}</h3>
           {!notification.read ? (
-            <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">Unread</span>
+            <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">{t("unread")}</span>
           ) : null}
         </div>
         <p className="mt-2 text-base leading-relaxed text-muted">{notification.message}</p>
         <p className="mt-2 text-sm font-semibold text-muted">
-          {formatDoseDate(notification.created_at)} · {formatDoseTimestamp(notification.created_at)}
+          {formatDoseDate(notification.created_at, language)} · {formatDoseTimestamp(notification.created_at, language)}
         </p>
         {!notification.read ? (
           <form action={action} className="mt-3">
             <input type="hidden" name="notification_id" value={notification.id} />
             <Button type="submit" variant="ghost" disabled={pending}>
-              <CheckCheck />{pending ? "Saving…" : "Mark as read"}
+              <CheckCheck />{t(pending ? "saving" : "markRead")}
             </Button>
           </form>
         ) : null}
         {state.status === "error" ? (
-          <p className="mt-2 text-sm font-bold text-danger" role="alert">{state.message}</p>
+          <p className="mt-2 text-sm font-bold text-danger" role="alert">{language === "ne" ? t("notificationUpdateError") : state.message}</p>
         ) : null}
       </div>
     </article>

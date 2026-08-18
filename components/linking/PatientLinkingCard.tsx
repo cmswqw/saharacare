@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { LinkedCaregiver } from "@/types";
+import { useApp } from "@/components/providers/AppProvider";
 
 export function PatientLinkingCard({
   linkingCode,
@@ -17,6 +18,7 @@ export function PatientLinkingCard({
   linkingCode: string;
   links: LinkedCaregiver[];
 }) {
+  const { t } = useApp();
   const [copied, setCopied] = useState(false);
   const pendingLinks = links.filter((link) => link.status === "pending");
   const acceptedLinks = links.filter((link) => link.status === "accepted");
@@ -35,10 +37,10 @@ export function PatientLinkingCard({
             <Link2 />
           </span>
           <div>
-            <p className="eyebrow">Caregiver access</p>
-            <h2 className="mt-1 text-2xl font-extrabold">Link a trusted caregiver</h2>
+            <p className="eyebrow">{t("caregiverAccess")}</p>
+            <h2 className="mt-1 text-2xl font-extrabold">{t("linkTrustedCaregiver")}</h2>
             <p className="mt-2 leading-relaxed text-muted">
-              Share this code privately. A caregiver sees no health information until you approve their request.
+              {t("caregiverCodeHelp")}
             </p>
           </div>
         </div>
@@ -48,7 +50,7 @@ export function PatientLinkingCard({
           </code>
           <Button type="button" variant="secondary" onClick={copyCode}>
             {copied ? <Check /> : <Copy />}
-            {copied ? "Copied" : "Copy code"}
+            {t(copied ? "copied" : "copyCode")}
           </Button>
         </div>
       </div>
@@ -56,7 +58,7 @@ export function PatientLinkingCard({
       <div className="p-5 md:p-6">
         {pendingLinks.length > 0 ? (
           <div>
-            <h3 className="text-lg font-extrabold">Requests waiting for approval</h3>
+            <h3 className="text-lg font-extrabold">{t("requestsWaiting")}</h3>
             <div className="mt-3 space-y-3">
               {pendingLinks.map((link) => (
                 <div key={link.link_id} className="flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center">
@@ -64,17 +66,17 @@ export function PatientLinkingCard({
                     <UserRound />
                   </span>
                   <div className="flex-1">
-                    <p className="font-extrabold">{link.caregiver?.full_name ?? "Caregiver request"}</p>
-                    <p className="mt-1 text-sm text-muted">Pending — no medication access yet</p>
+                    <p className="font-extrabold">{link.caregiver?.full_name ?? t("caregiverRequest")}</p>
+                    <p className="mt-1 text-sm text-muted">{t("pendingNoAccess")}</p>
                   </div>
                   <div className="flex gap-2">
                     <form action={approveCaregiverLinkAction}>
                       <input type="hidden" name="link_id" value={link.link_id} />
-                      <Button type="submit" variant="success"><Check />Approve</Button>
+                      <Button type="submit" variant="success"><Check />{t("approve")}</Button>
                     </form>
                     <form action={removeCaregiverLinkAction}>
                       <input type="hidden" name="link_id" value={link.link_id} />
-                      <Button type="submit" variant="secondary"><X />Decline</Button>
+                      <Button type="submit" variant="secondary"><X />{t("decline")}</Button>
                     </form>
                   </div>
                 </div>
@@ -85,11 +87,11 @@ export function PatientLinkingCard({
 
         <div className={pendingLinks.length > 0 ? "mt-6 border-t pt-6" : ""}>
           <h3 className="flex items-center gap-2 text-lg font-extrabold">
-            <ShieldCheck className="text-success" />Approved caregivers
+            <ShieldCheck className="text-success" />{t("approvedCaregivers")}
           </h3>
           {acceptedLinks.length === 0 ? (
             <p className="mt-3 rounded-2xl bg-slate-50 p-4 text-muted dark:bg-slate-900">
-              No caregiver has been approved yet.
+              {t("noApprovedCaregivers")}
             </p>
           ) : (
             <div className="mt-3 space-y-3">
@@ -99,17 +101,17 @@ export function PatientLinkingCard({
                     <UserRound />
                   </span>
                   <div className="flex-1">
-                    <p className="font-extrabold">{link.caregiver?.full_name ?? "Approved caregiver"}</p>
-                    <p className="mt-1 text-sm font-bold text-success">Can view active medications and schedules</p>
+                    <p className="font-extrabold">{link.caregiver?.full_name ?? t("approvedCaregiver")}</p>
+                    <p className="mt-1 text-sm font-bold text-success">{t("caregiverCanView")}</p>
                   </div>
                   <form
                     action={removeCaregiverLinkAction}
                     onSubmit={(event) => {
-                      if (!window.confirm("Remove this caregiver’s access?")) event.preventDefault();
+                      if (!window.confirm(t("removeCaregiverConfirm"))) event.preventDefault();
                     }}
                   >
                     <input type="hidden" name="link_id" value={link.link_id} />
-                    <Button type="submit" variant="secondary">Remove access</Button>
+                    <Button type="submit" variant="secondary">{t("removeAccess")}</Button>
                   </form>
                 </div>
               ))}

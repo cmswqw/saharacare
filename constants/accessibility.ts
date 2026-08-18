@@ -1,5 +1,5 @@
 export const textSizes = [
-  { value: "normal", label: "Normal", preview: "A" },
-  { value: "large", label: "Large", preview: "A" },
-  { value: "extra", label: "Extra large", preview: "A" },
+  { value: "normal", labelKey: "textSmall", preview: "A" },
+  { value: "large", labelKey: "textLarge", preview: "A" },
+  { value: "extra", labelKey: "textExtraLarge", preview: "A" },
 ] as const;

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { useApp } from "@/components/providers/AppProvider";
 
 export default function LandingPage() {
-  const { t, language } = useApp();
+  const { t } = useApp();
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#F8FAFC] text-[#111827] dark:bg-slate-950 dark:text-slate-50">
@@ -17,11 +17,11 @@ export default function LandingPage() {
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-white">
             <HeartPulse />
           </span>
-          <span className="text-2xl font-extrabold">SaharaCare</span>
+          <span className="hidden text-2xl font-extrabold sm:inline">SaharaCare</span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login" className="hidden min-h-12 items-center rounded-2xl px-4 font-extrabold text-primary hover:bg-blue-50 sm:flex">
-            Sign in
+            {t("signIn")}
           </Link>
           <LanguageToggle />
         </div>
@@ -35,7 +35,7 @@ export default function LandingPage() {
         >
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-primary dark:bg-blue-950/40">
             <ShieldCheck className="h-5 w-5" />
-            Simple care. Reassuring support.
+            {t("simpleCareSupport")}
           </div>
           <h1 className="max-w-2xl text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
             {t("tagline")}
@@ -44,7 +44,7 @@ export default function LandingPage() {
             {t("taglineDetail")}
           </p>
           <p className="mt-3 text-xl font-bold text-primary">
-            {language === "ne" ? "Medicine support for your family" : "तपाईंको परिवारका लागि औषधि सहयोग"}
+            {t("landingAlternateTagline")}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="large" className="min-h-20 w-full text-2xl sm:w-auto sm:px-10">
@@ -54,13 +54,13 @@ export default function LandingPage() {
               </Link>
             </Button>
             <Button asChild size="large" variant="secondary" className="sm:hidden">
-              <Link href="/login">Sign in</Link>
+              <Link href="/login">{t("signIn")}</Link>
             </Button>
           </div>
           <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-base font-bold text-muted">
-            <span className="flex items-center gap-2"><Check className="text-success" />Secure sign-in</span>
-            <span className="flex items-center gap-2"><Check className="text-success" />English & नेपाली</span>
-            <span className="flex items-center gap-2"><Check className="text-success" />Role-based access</span>
+            <span className="flex items-center gap-2"><Check className="text-success" />{t("secureSignIn")}</span>
+            <span className="flex items-center gap-2"><Check className="text-success" />{t("bilingualSupport")}</span>
+            <span className="flex items-center gap-2"><Check className="text-success" />{t("roleBasedAccess")}</span>
           </div>
         </motion.div>
 
@@ -74,8 +74,8 @@ export default function LandingPage() {
           <div className="relative rounded-[2.5rem] border border-white bg-white p-5 shadow-[0_30px_80px_rgba(37,99,235,0.18)] dark:border-slate-700 dark:bg-slate-900 md:p-8">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-bold uppercase tracking-widest text-primary">Patient preview</p>
-                <p className="mt-1 text-2xl font-extrabold">Simple daily support</p>
+                <p className="text-sm font-bold uppercase tracking-widest text-primary">{t("patientPreview")}</p>
+                <p className="mt-1 text-2xl font-extrabold">{t("simpleDailySupport")}</p>
               </div>
               <span className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-50 text-primary"><UsersRound /></span>
             </div>
@@ -85,23 +85,23 @@ export default function LandingPage() {
                   <Pill className="h-11 w-11 rotate-45" />
                 </span>
                 <div>
-                  <p className="text-sm font-bold text-primary">MEDICINE REMINDER</p>
-                  <h2 className="mt-1 text-2xl font-extrabold">Your medicine</h2>
-                  <p className="mt-1 font-semibold text-muted">1 tablet · After breakfast</p>
+                  <p className="text-sm font-bold text-primary">{t("medicineReminderUpper")}</p>
+                  <h2 className="mt-1 text-2xl font-extrabold">{t("yourMedicine")}</h2>
+                  <p className="mt-1 font-semibold text-muted">{t("previewDose")}</p>
                 </div>
               </div>
               <div className="mt-5 flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-success px-5 text-xl font-bold text-white">
-                <Check />Record dose safely
+                <Check />{t("recordDoseSafely")}
               </div>
             </div>
             <div className="mt-5 grid grid-cols-2 gap-4">
               <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800">
                 <BellRing className="text-primary" />
-                <p className="mt-3 font-extrabold">Gentle reminders</p>
+                <p className="mt-3 font-extrabold">{t("gentleReminders")}</p>
               </div>
               <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800">
                 <HeartPulse className="text-danger" />
-                <p className="mt-3 font-extrabold">Help in one tap</p>
+                <p className="mt-3 font-extrabold">{t("helpInOneTap")}</p>
               </div>
             </div>
           </div>

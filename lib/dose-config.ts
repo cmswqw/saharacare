@@ -1,4 +1,5 @@
 import type { DoseStatus, TodayDose } from "@/types";
+import type { Language } from "@/types";
 
 export const SAHARACARE_TIME_ZONE = "Asia/Kathmandu";
 export const LATE_AFTER_MINUTES = 15;
@@ -128,16 +129,16 @@ export function deriveDoseStatus(
   return "scheduled";
 }
 
-export function formatDoseTimestamp(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
+export function formatDoseTimestamp(value: string, language: Language = "en") {
+  return new Intl.DateTimeFormat(language === "ne" ? "ne-NP" : "en-US", {
     timeZone: SAHARACARE_TIME_ZONE,
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
 }
 
-export function formatDoseDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
+export function formatDoseDate(value: string, language: Language = "en") {
+  return new Intl.DateTimeFormat(language === "ne" ? "ne-NP" : "en-US", {
     timeZone: SAHARACARE_TIME_ZONE,
     weekday: "long",
     month: "long",

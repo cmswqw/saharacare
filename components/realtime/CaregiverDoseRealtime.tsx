@@ -63,7 +63,7 @@ function chunkPatientIds(patientIds: string[]) {
 
 export function CaregiverDoseRealtime({ patients }: { patients: RealtimePatient[] }) {
   const router = useRouter();
-  const { toast } = useApp();
+  const { language, t, toast } = useApp();
   const patientsRef = useRef(patients);
   const seenEventsRef = useRef(new Map<string, number>());
   const refreshTimerRef = useRef<number | null>(null);
@@ -110,10 +110,14 @@ export function CaregiverDoseRealtime({ patients }: { patients: RealtimePatient[
         if (row.status === "taken" && row.takenAt) {
           const patient = patientsRef.current.find((item) => item.patientId === row.patientId);
           const dose = patient?.doses.find((item) => item.id === row.id);
-          const patientName = patient?.fullName.trim().split(/\s+/)[0] || "Your patient";
-          const medicationName = dose?.medicationName ?? "a scheduled medicine";
+          const patientName = patient?.fullName.trim().split(/\s+/)[0] || t("yourPatient");
+          const medicationName = dose?.medicationName ?? t("scheduledMedicine");
           toast(
-            `${patientName} took ${medicationName} at ${formatDoseTimestamp(row.takenAt)}.`,
+            t("patientTookMedicine", {
+              patient: patientName,
+              medicine: medicationName,
+              time: formatDoseTimestamp(row.takenAt, language),
+            }),
             "success",
           );
         }
@@ -148,7 +152,7 @@ export function CaregiverDoseRealtime({ patients }: { patients: RealtimePatient[
             && !connectionWarningShown
           ) {
             connectionWarningShown = true;
-            toast("Live dose updates are temporarily unavailable. Normal refresh still works.", "warning");
+            toast(t("liveDoseUnavailable"), "warning");
           }
         });
     });
@@ -163,7 +167,7 @@ export function CaregiverDoseRealtime({ patients }: { patients: RealtimePatient[
         void supabase.removeChannel(channel);
       }
     };
-  }, [router, subscriptionKey, toast]);
+  }, [language, router, subscriptionKey, t, toast]);
 
   return null;
 }

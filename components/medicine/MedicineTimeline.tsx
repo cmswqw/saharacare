@@ -1,3 +1,5 @@
+"use client";
+
 import { Clock3, Pill } from "lucide-react";
 import {
   flattenMedicationSchedules,
@@ -5,12 +7,14 @@ import {
   formatScheduleDays,
 } from "@/lib/medication-utils";
 import type { Medication } from "@/types";
+import { useApp } from "@/components/providers/AppProvider";
 
 export function MedicineTimeline({ medications }: { medications: Medication[] }) {
+  const { language, t } = useApp();
   const schedule = flattenMedicationSchedules(medications);
 
   if (schedule.length === 0) {
-    return <p className="rounded-2xl bg-slate-50 p-5 text-muted dark:bg-slate-900">No active medication times are scheduled.</p>;
+    return <p className="rounded-2xl bg-slate-50 p-5 text-muted dark:bg-slate-900">{t("noActiveMedicationTimes")}</p>;
   }
 
   return (
@@ -28,7 +32,7 @@ export function MedicineTimeline({ medications }: { medications: Medication[] })
           <div className="rounded-2xl border bg-card p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-lg font-extrabold">{formatMedicationTime(item.scheduled_time)}</p>
+                <p className="text-lg font-extrabold">{formatMedicationTime(item.scheduled_time, language)}</p>
                 <p className="mt-1 flex items-center gap-2 font-bold">
                   <Pill className="h-5 w-5 rotate-45 text-primary" />
                   {medication.name} · {medication.dosage}
@@ -38,7 +42,7 @@ export function MedicineTimeline({ medications }: { medications: Medication[] })
                 ) : null}
               </div>
               <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-extrabold text-primary dark:bg-blue-950/40">
-                {formatScheduleDays(item.days_of_week)}
+                {formatScheduleDays(item.days_of_week, language)}
               </span>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import type { Medication, MedicationSchedule } from "@/types";
+import type { Language } from "@/types";
 
 export const WEEKDAYS = [
   { value: 0, short: "Sun" },
@@ -10,30 +11,35 @@ export const WEEKDAYS = [
   { value: 6, short: "Sat" },
 ] as const;
 
-export function formatMedicationTime(value: string) {
+export function formatMedicationTime(value: string, language: Language = "en") {
   const [hours = "0", minutes = "0"] = value.split(":");
-  const hour = Number(hours);
-  const suffix = hour >= 12 ? "PM" : "AM";
-  const displayHour = hour % 12 || 12;
-
-  return `${displayHour}:${minutes.padStart(2, "0")} ${suffix}`;
+  const date = new Date(Date.UTC(2020, 0, 1, Number(hours), Number(minutes)));
+  return new Intl.DateTimeFormat(language === "ne" ? "ne-NP" : "en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(date);
 }
 
 export function inputTime(value: string) {
   return value.slice(0, 5);
 }
 
-export function formatScheduleDays(days: number[]) {
+export function formatScheduleDays(days: number[], language: Language = "en") {
   const uniqueDays = [...new Set(days)].sort((a, b) => a - b);
 
-  if (uniqueDays.length === 7) return "Every day";
+  if (uniqueDays.length === 7) return language === "ne" ? "हरेक दिन" : "Every day";
   if (
     uniqueDays.length === 5
     && uniqueDays.every((day, index) => day === index + 1)
-  ) return "Weekdays";
+  ) return language === "ne" ? "कामकाजी दिन" : "Weekdays";
+
+  const localizedDays = language === "ne"
+    ? ["आइत", "सोम", "मङ्गल", "बुध", "बिही", "शुक्र", "शनि"]
+    : WEEKDAYS.map((day) => day.short);
 
   return uniqueDays
-    .map((day) => WEEKDAYS.find((item) => item.value === day)?.short)
+    .map((day) => localizedDays[day])
     .filter(Boolean)
     .join(", ");
 }

@@ -19,7 +19,7 @@ export function PatientSidebar() {
         </span>
         <span className="text-2xl font-extrabold">SaharaCare</span>
       </Link>
-      <nav aria-label="Patient navigation" className="space-y-2">
+      <nav aria-label={t("patientNavigation")} className="space-y-2">
         {patientNavigation.map(({ href, label, icon: Icon }) => {
           const active = href === "/patient" ? pathname === href : pathname.startsWith(href);
           return (
@@ -49,9 +49,9 @@ export function PatientSidebar() {
           {t("settings")}
         </Link>
         <p className="mt-4 px-4 text-sm text-muted">
-          Secure medication records
+          {t("secureMedicationRecords")}
           <br />
-          Connected with Supabase.
+          {t("connectedWithSupabase")}
         </p>
       </div>
     </aside>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LoaderCircle, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
+import { useApp } from "@/components/providers/AppProvider";
 
 export function LogoutButton({
   className,
@@ -14,6 +15,7 @@ export function LogoutButton({
   iconOnly?: boolean;
 }) {
   const router = useRouter();
+  const { t } = useApp();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +29,7 @@ export function LogoutButton({
     const { error: signoutError } = await supabase.auth.signOut();
 
     if (signoutError) {
-      setError("SaharaCare could not sign you out. Please try again.");
+      setError(t("signoutError"));
       setSubmitting(false);
       return;
     }
@@ -45,10 +47,10 @@ export function LogoutButton({
         className={iconOnly ? undefined : "w-full"}
         onClick={logout}
         disabled={submitting}
-        aria-label={iconOnly ? "Sign out" : undefined}
+        aria-label={iconOnly ? t("signOut") : undefined}
       >
         {submitting ? <LoaderCircle className="animate-spin" /> : <LogOut />}
-        {iconOnly ? null : submitting ? "Signing out…" : "Sign out"}
+        {iconOnly ? null : submitting ? t("signingOut") : t("signOut")}
       </Button>
       {error ? <p role="alert" className={iconOnly ? "sr-only" : "mt-2 text-sm font-semibold text-red-600"}>{error}</p> : null}
     </div>

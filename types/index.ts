@@ -1,6 +1,6 @@
 export type Language = "en" | "ne";
 export type DoseStatus = "scheduled" | "taken" | "late" | "missed";
-export type UserRole = "patient" | "caregiver";
+export type UserRole = "patient" | "caregiver" | "doctor";
 
 export type AuthProfile = {
   id: string;
@@ -105,14 +105,40 @@ export type Contact = {
   type: "caregiver" | "doctor" | "hospital" | "emergency";
 };
 
+export type AppointmentStatus = "requested" | "confirmed" | "completed" | "cancelled";
+
 export type Appointment = {
   id: string;
-  doctor: string;
+  patient_id: string;
+  doctor_id: string;
+  doctor_name: string;
+  patient_name?: string;
   facility: string;
-  date: string;
-  time: string;
   purpose: string;
-  status: "Requested" | "Confirmed" | "Completed" | "Cancelled";
+  note: string | null;
+  starts_at: string;
+  ends_at: string;
+  status: AppointmentStatus;
+  created_at: string;
+};
+
+export type AppointmentMedicalShare = {
+  id: string;
+  appointment_id: string;
+  expires_at: string;
+  revoked_at: string | null;
+  created_at: string;
+  files: AppointmentMedicalFile[];
+};
+
+export type AppointmentMedicalFile = {
+  id: string;
+  share_id: string;
+  original_filename: string;
+  mime_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+  size_bytes: number;
+  kind: "medical_summary" | "supporting";
+  created_at: string;
 };
 
 export type MedicationNotificationType =

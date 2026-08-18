@@ -1,15 +1,11 @@
+"use client";
+
 import { Check, Clock3, Pill, TriangleAlert } from "lucide-react";
 import { MarkDoseTakenButton } from "@/components/doses/MarkDoseTakenButton";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { formatDoseTimestamp } from "@/lib/dose-config";
 import type { DoseStatus, TodayDose } from "@/types";
-
-const statusLabels: Record<DoseStatus, string> = {
-  scheduled: "Scheduled",
-  taken: "Taken",
-  late: "Late",
-  missed: "Missed",
-};
+import { useApp } from "@/components/providers/AppProvider";
 
 function DoseIcon({ status }: { status: DoseStatus }) {
   if (status === "taken") return <Check />;
@@ -24,10 +20,17 @@ export function TodayDoseTimeline({
   doses: TodayDose[];
   readOnly?: boolean;
 }) {
+  const { language, t } = useApp();
+  const statusLabels: Record<DoseStatus, string> = {
+    scheduled: t("scheduled"),
+    taken: t("taken"),
+    late: t("late"),
+    missed: t("missed"),
+  };
   if (doses.length === 0) {
     return (
       <p className="rounded-2xl bg-slate-50 p-5 text-muted dark:bg-slate-900">
-        No doses are scheduled for today.
+        {t("noDosesToday")}
       </p>
     );
   }
@@ -55,7 +58,7 @@ export function TodayDoseTimeline({
           <div className="rounded-2xl border bg-card p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-lg font-extrabold">{formatDoseTimestamp(dose.scheduled_at)}</p>
+                <p className="text-lg font-extrabold">{formatDoseTimestamp(dose.scheduled_at, language)}</p>
                 <p className="mt-1 flex items-center gap-2 font-bold">
                   <Pill className="h-5 w-5 rotate-45 text-primary" />
                   {dose.medication.name} · {dose.medication.dosage}
@@ -64,7 +67,7 @@ export function TodayDoseTimeline({
                   <p className="mt-2 text-sm text-muted">{dose.medication.instructions}</p>
                 ) : null}
                 {dose.taken_at ? (
-                  <p className="mt-2 font-bold text-success">Taken at {formatDoseTimestamp(dose.taken_at)}</p>
+                  <p className="mt-2 font-bold text-success">{t("takenAt", { time: formatDoseTimestamp(dose.taken_at, language) })}</p>
                 ) : null}
               </div>
               <div className="flex flex-col items-start gap-3 sm:items-end">

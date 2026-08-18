@@ -16,7 +16,11 @@ export default async function SignupPage({
   }
 
   const params = await searchParams;
-  const role: UserRole = params.role === "caregiver" ? "caregiver" : "patient";
+  const role: UserRole = params.role === "caregiver"
+    ? "caregiver"
+    : params.role === "doctor"
+      ? "doctor"
+      : "patient";
 
   return <AuthForm mode="signup" initialRole={role} />;
 }

@@ -11,12 +11,14 @@ import {
 } from "lucide-react";
 import { runDemoAction } from "@/app/actions/demo";
 import { Button } from "@/components/ui/Button";
+import { useApp } from "@/components/providers/AppProvider";
 import type { DemoActionState } from "@/types";
 
 const initialState: DemoActionState = { status: "idle", message: "" };
 
 export function DemoTools() {
   const [state, formAction, pending] = useActionState(runDemoAction, initialState);
+  const { language, t } = useApp();
 
   return (
     <section
@@ -29,13 +31,13 @@ export function DemoTools() {
         </span>
         <div>
           <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-amber-800 dark:text-amber-200">
-            Demo Mode
+            {t("demoMode")}
           </p>
           <h2 id="demo-tools-title" className="mt-1 text-2xl font-extrabold">
-            Hackathon demo tools
+            {t("hackathonDemoTools")}
           </h2>
           <p className="mt-2 leading-relaxed text-muted">
-            Patient-only controls backed by real Supabase dose records, notifications, analytics, and Realtime updates.
+            {t("demoToolsHelp")}
           </p>
         </div>
       </div>
@@ -48,7 +50,7 @@ export function DemoTools() {
           if (
             submitter?.value === "reset"
             && !window.confirm(
-              "Reset will replace this demo patient's medications, dose history, and medication notifications. The caregiver link and sign-in accounts stay intact. Continue?",
+              t("demoResetConfirm"),
             )
           ) {
             event.preventDefault();
@@ -58,16 +60,16 @@ export function DemoTools() {
         <input type="hidden" name="confirm_reset" value="RESET_DEMO_DATA" />
         <div className="grid gap-3 sm:grid-cols-2">
           <Button type="submit" name="demo_action" value="due_now" variant="secondary" disabled={pending}>
-            <Clock3 />Dose Due Now
+            <Clock3 />{t("doseDueNow")}
           </Button>
           <Button type="submit" name="demo_action" value="taken" variant="success" disabled={pending}>
-            <CheckCircle2 />Dose Taken
+            <CheckCircle2 />{t("doseTaken")}
           </Button>
           <Button type="submit" name="demo_action" value="late" variant="warning" disabled={pending}>
-            <TimerReset />Dose Late
+            <TimerReset />{t("doseLate")}
           </Button>
           <Button type="submit" name="demo_action" value="missed" variant="danger" disabled={pending}>
-            <TriangleAlert />Dose Missed
+            <TriangleAlert />{t("doseMissed")}
           </Button>
           <Button
             type="submit"
@@ -78,7 +80,7 @@ export function DemoTools() {
             disabled={pending}
           >
             <RefreshCcw className={pending ? "animate-spin" : ""} />
-            {pending ? "Updating demo data…" : "Reset Demo Data"}
+            {pending ? t("updatingDemo") : t("resetDemoData")}
           </Button>
         </div>
       </form>
@@ -93,13 +95,15 @@ export function DemoTools() {
                 : "bg-red-100 text-red-900 dark:bg-red-950/40 dark:text-red-100"
             }`}
           >
-            {state.message}
+            {language === "en" && state.message
+              ? state.message
+              : t(state.status === "success" ? "demoActionSuccess" : "demoActionError")}
           </p>
         ) : null}
       </div>
 
       <p className="mt-3 text-sm leading-relaxed text-muted">
-        Reset first before presenting. These controls never delete authentication users or caregiver links.
+        {t("demoResetHelp")}
       </p>
     </section>
   );

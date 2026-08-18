@@ -13,14 +13,14 @@ export default function ProfilePage() {
   const profile = useCurrentUser();
   const rows = [
     { icon: Languages, label: t("language"), value: language === "ne" ? "नेपाली" : "English" },
-    { icon: Stethoscope, label: "Doctor", value: contacts[1].name },
-    { icon: Building2, label: "Hospital", value: contacts[2].name },
-    { icon: Phone, label: "Emergency contact", value: `${contacts[0].name} · Demo number` },
+    { icon: Stethoscope, label: t("doctor"), value: contacts[1].name },
+    { icon: Building2, label: t("hospital"), value: contacts[2].name },
+    { icon: Phone, label: t("emergencyContact"), value: `${contacts[0].name} · ${t("demoNumber")}` },
   ];
 
   return (
     <div>
-      <p className="eyebrow">Personal details</p>
+      <p className="eyebrow">{t("personalDetails")}</p>
       <h1 className="patient-heading mt-2">{t("profile")}</h1>
       <Card className="mt-8 overflow-hidden">
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 dark:from-blue-950/50 dark:to-slate-800 md:p-8">
@@ -31,10 +31,10 @@ export default function ProfilePage() {
             <div className="flex-1">
               <h2 className="text-3xl font-extrabold">{profile.full_name}</h2>
               <p className="mt-1 text-lg text-muted">{profile.email}</p>
-              <p className="mt-3 text-base font-bold capitalize text-muted">{profile.role}</p>
+              <p className="mt-3 text-base font-bold text-muted">{t(profile.role === "patient" ? "rolePatient" : profile.role === "caregiver" ? "roleCaregiver" : "roleDoctor")}</p>
             </div>
-            <Button variant="secondary" onClick={() => toast("Profile editing is not connected in this phase.")}>
-              <Pencil />Edit profile
+            <Button variant="secondary" onClick={() => toast(t("profileEditingUnavailable"))}>
+              <Pencil />{t("editProfile")}
             </Button>
           </div>
         </div>
@@ -46,7 +46,7 @@ export default function ProfilePage() {
                 <p className="text-sm font-bold uppercase tracking-wide text-muted">{label}</p>
                 <p className="mt-1 text-lg font-extrabold">{value}</p>
               </div>
-              <Button variant="ghost" size="icon" aria-label={`Edit ${label}`} onClick={() => toast(`${label} edit demo opened.`)}><Pencil /></Button>
+              <Button variant="ghost" size="icon" aria-label={t("editLabel", { label })} onClick={() => toast(t("editDemoOpened", { label }))}><Pencil /></Button>
             </div>
           ))}
         </div>
@@ -55,7 +55,7 @@ export default function ProfilePage() {
         <Link href="/settings"><Settings />{t("settings")}</Link>
       </Button>
       <p className="mt-4 text-center text-sm text-muted">
-        Medication and caregiver-link data are live. Contact details remain demonstration data for a later phase.
+        {t("profileDataNotice")}
       </p>
     </div>
   );

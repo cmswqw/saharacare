@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { LinkedPatient, Phase4ActionState } from "@/types";
+import { useApp } from "@/components/providers/AppProvider";
 
 const initialState: Phase4ActionState = {
   status: "idle",
@@ -16,6 +17,7 @@ const initialState: Phase4ActionState = {
 };
 
 export function CaregiverConnectCard({ links }: { links: LinkedPatient[] }) {
+  const { language, t } = useApp();
   const [state, formAction, pending] = useActionState(
     requestCaregiverLinkAction,
     initialState,
@@ -29,17 +31,17 @@ export function CaregiverConnectCard({ links }: { links: LinkedPatient[] }) {
           <Link2 />
         </span>
         <div>
-          <p className="eyebrow">Connect securely</p>
-          <h2 className="mt-1 text-2xl font-extrabold">Enter a patient linking code</h2>
+          <p className="eyebrow">{t("connectSecurely")}</p>
+          <h2 className="mt-1 text-2xl font-extrabold">{t("enterPatientCode")}</h2>
           <p className="mt-2 leading-relaxed text-muted">
-            Ask the patient for their SaharaCare code. Their approval is required before any medication details become visible.
+            {t("patientCodeHelp")}
           </p>
         </div>
       </div>
 
       <form action={formAction} className="mt-5 flex flex-col gap-3 sm:flex-row">
         <label className="flex-1">
-          <span className="sr-only">Patient linking code</span>
+          <span className="sr-only">{t("patientLinkingCode")}</span>
           <input
             name="patient_code"
             required
@@ -50,7 +52,7 @@ export function CaregiverConnectCard({ links }: { links: LinkedPatient[] }) {
           />
         </label>
         <Button type="submit" size="large" disabled={pending}>
-          <Link2 />{pending ? "Sending…" : "Send request"}
+          <Link2 />{t(pending ? "sending" : "sendRequest")}
         </Button>
       </form>
 
@@ -64,21 +66,23 @@ export function CaregiverConnectCard({ links }: { links: LinkedPatient[] }) {
           }`}
         >
           {state.status === "success" ? <ShieldCheck className="me-2 inline" /> : null}
-          {state.message}
+          {language === "ne"
+            ? t(state.status === "success" ? "linkRequestSuccess" : "linkRequestError")
+            : state.message}
         </p>
       ) : null}
 
       {pendingLinks.length > 0 ? (
         <div className="mt-5 border-t pt-5">
-          <h3 className="font-extrabold">Pending requests</h3>
+          <h3 className="font-extrabold">{t("pendingRequests")}</h3>
           <div className="mt-3 space-y-3">
             {pendingLinks.map((link) => (
               <div key={link.link_id} className="flex items-center gap-3 rounded-2xl bg-amber-50 p-4 text-amber-950 dark:bg-amber-950/30 dark:text-amber-100">
                 <Clock3 className="shrink-0" />
-                <p className="flex-1 font-bold">Waiting for patient approval</p>
+                <p className="flex-1 font-bold">{t("waitingPatientApproval")}</p>
                 <form action={removeCaregiverLinkAction}>
                   <input type="hidden" name="link_id" value={link.link_id} />
-                  <Button type="submit" variant="ghost" size="icon" aria-label="Cancel request">
+                  <Button type="submit" variant="ghost" size="icon" aria-label={t("cancelRequest")}>
                     <X />
                   </Button>
                 </form>

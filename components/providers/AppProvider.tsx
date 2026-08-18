@@ -1,9 +1,12 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { Appointment, Language } from "@/types";
-import { initialAppointments } from "@/mock-data";
-import { translate, type TranslationKey } from "@/lib/i18n";
+import type { Language } from "@/types";
+import {
+  translate,
+  type TranslationKey,
+  type TranslationValues,
+} from "@/lib/i18n";
 import { Toast } from "@/components/ui/Toast";
 
 type TextSize = "normal" | "large" | "extra";
@@ -12,7 +15,7 @@ type ToastState = { message: string; tone?: "success" | "info" | "warning" } | n
 type AppContextValue = {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: TranslationKey, values?: TranslationValues) => string;
   textSize: TextSize;
   setTextSize: (size: TextSize) => void;
   darkMode: boolean;
@@ -23,9 +26,7 @@ type AppContextValue = {
   setReducedMotion: (enabled: boolean) => void;
   reminderSound: boolean;
   setReminderSound: (enabled: boolean) => void;
-  appointments: Appointment[];
-  addAppointment: (appointment: Appointment) => void;
-  activities: string[];
+  activities: TranslationKey[];
   toast: (message: string, tone?: "success" | "info" | "warning") => void;
 };
 
@@ -38,10 +39,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [highContrast, setHighContrast] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [reminderSound, setReminderSound] = useState(true);
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [activities] = useState([
-    "Appointment requested · 2 days ago",
-    "Reminder delayed by 10 minutes · Yesterday",
+  const [activities] = useState<TranslationKey[]>([
+    "activityAppointmentRequested",
+    "activityReminderDelayed",
   ]);
   const [toastState, setToastState] = useState<ToastState>(null);
 
@@ -80,7 +80,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AppContextValue>(() => ({
     language,
     setLanguage,
-    t: (key) => translate(language, key),
+    t: (key, values) => translate(language, key, values),
     textSize,
     setTextSize,
     darkMode,
@@ -91,13 +91,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setReducedMotion,
     reminderSound,
     setReminderSound,
-    appointments,
-    addAppointment: (appointment) => setAppointments((items) => [appointment, ...items]),
     activities,
     toast,
   }), [
     activities,
-    appointments,
     darkMode,
     highContrast,
     language,
