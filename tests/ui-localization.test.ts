@@ -60,6 +60,25 @@ test("medicine dialog is constrained to the dynamic viewport and scrolls interna
   assert.match(medicationForm, /min-h-14 min-w-0 flex-1/);
 });
 
+test("quick actions span the desktop dashboard grid and contain localized labels", () => {
+  const sections = source("components/patient/PatientDashboardSections.tsx");
+
+  assert.match(sections, /xl:col-span-2/);
+  assert.match(sections, /grid-cols-1 gap-4 min-\[375px\]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-5/);
+  assert.match(sections, /min-h-32 min-w-0 w-full/);
+  assert.match(sections, /leading-tight whitespace-normal break-words \[overflow-wrap:anywhere\]/);
+  assert.match(sections, /focus-visible:ring-4/);
+  for (const route of [
+    "/patient/medicines",
+    "/patient/appointments",
+    "/patient/medical-information",
+    "/patient/assistant",
+    "/patient/profile",
+  ]) {
+    assert.match(sections, new RegExp(route.replaceAll("/", "\\/")));
+  }
+});
+
 test("TSX does not contain unreviewed hard-coded English JSX labels", () => {
   const files: string[] = [];
   const allowed = new Set(["SaharaCare", "English", "Maya Sharma", "SC-XXXXXXXXXX"]);
