@@ -7,7 +7,7 @@ export function createAdminClient() {
   const secretKey = process.env.SUPABASE_SECRET_KEY;
 
   if (!url || !secretKey) {
-    throw new Error("Server-side Supabase file operations are not configured.");
+    throw new Error("Server-side Supabase operations are not configured.");
   }
 
   return createClient(url, secretKey, {

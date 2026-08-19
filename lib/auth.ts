@@ -31,7 +31,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
   if (
     profileError
     || !data
-    || (data.role !== "patient" && data.role !== "caregiver" && data.role !== "doctor")
+    || (data.role !== "patient" && data.role !== "caregiver" && data.role !== "doctor" && data.role !== "admin")
   ) {
     return { profile: null, signedIn: true };
   }

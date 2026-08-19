@@ -1,6 +1,6 @@
 export type Language = "en" | "ne";
 export type DoseStatus = "scheduled" | "taken" | "late" | "missed";
-export type UserRole = "patient" | "caregiver" | "doctor";
+export type UserRole = "patient" | "caregiver" | "doctor" | "admin";
 
 export type AuthProfile = {
   id: string;
@@ -8,6 +8,40 @@ export type AuthProfile = {
   role: UserRole;
   avatar_url: string | null;
   email: string | null;
+};
+
+export type AdminAccountStatus = "active" | "inactive";
+
+export type AdminDirectoryPerson = {
+  id: string;
+  displayName: string;
+  accountStatus: AdminAccountStatus;
+};
+
+export type AdminDirectoryPatient = AdminDirectoryPerson & {
+  caregivers: Pick<AdminDirectoryPerson, "id" | "displayName">[];
+};
+
+export type AdminDirectoryCaregiver = AdminDirectoryPerson & {
+  patients: Pick<AdminDirectoryPerson, "id" | "displayName">[];
+};
+
+export type AdminDirectoryDoctor = AdminDirectoryPerson & {
+  createdAt: string;
+  role: "doctor";
+};
+
+export type AdminDirectory = {
+  summary: {
+    totalPatients: number;
+    patientsWithCaregiver: number;
+    patientsWithoutCaregiver: number;
+    activeCaregivers: number;
+    activeDoctors: number;
+  };
+  patients: AdminDirectoryPatient[];
+  caregivers: AdminDirectoryCaregiver[];
+  doctors: AdminDirectoryDoctor[];
 };
 
 export type MedicationSchedule = {

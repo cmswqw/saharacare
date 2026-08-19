@@ -27,7 +27,6 @@ export default async function PatientHomePage() {
   return (
     <PatientDashboard
       medications={medicationResult.data}
-      linkingCode={linkingResult.data.linkingCode}
       caregiverLinks={linkingResult.data.links}
       todayDoses={doseResult.data}
       weeklyAdherence={analyticsResult.data.weekly}

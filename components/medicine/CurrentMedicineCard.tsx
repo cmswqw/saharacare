@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Clock3, Pill } from "lucide-react";
 import { MarkDoseTakenButton } from "@/components/doses/MarkDoseTakenButton";
 import { Card } from "@/components/ui/Card";
@@ -44,11 +43,10 @@ export function CurrentMedicineCard({ dose }: { dose: TodayDose }) {
           />
         </div>
       </div>
-      <div className="p-5 md:p-8">
-        <div className="grid grid-cols-[104px_1fr] gap-4 md:grid-cols-[140px_1fr] md:gap-6">
-          <div className="relative grid aspect-square place-items-center overflow-hidden rounded-3xl bg-gradient-to-br from-blue-100 to-indigo-50 dark:from-blue-950 dark:to-slate-800" aria-label={t("medicationIllustration")}>
-            <div className="absolute h-20 w-20 rounded-full bg-white/70 md:h-28 md:w-28" />
-            <Pill className="relative h-14 w-14 rotate-45 text-primary md:h-20 md:w-20" strokeWidth={1.5} />
+      <div className="p-5 md:p-7">
+        <div className="grid grid-cols-[64px_1fr] gap-4 md:grid-cols-[76px_1fr] md:gap-5">
+          <div className="grid h-16 w-16 place-items-center rounded-2xl bg-blue-50 text-primary dark:bg-blue-950 md:h-[76px] md:w-[76px]" aria-label={t("medicationIllustration")}>
+            <Pill className="h-9 w-9 rotate-45 md:h-11 md:w-11" strokeWidth={1.75} />
           </div>
           <div className="min-w-0">
             <h2 className="text-2xl font-extrabold md:text-4xl">{dose.medication.name}</h2>
@@ -64,14 +62,14 @@ export function CurrentMedicineCard({ dose }: { dose: TodayDose }) {
             ) : null}
           </div>
         </div>
-        <motion.div whileTap={{ scale: 0.98 }} className="mt-7">
+        <div className="mt-6">
           <MarkDoseTakenButton
             doseId={dose.id}
             status={dose.status}
             takenAt={dose.taken_at}
             large
           />
-        </motion.div>
+        </div>
       </div>
     </Card>
   );

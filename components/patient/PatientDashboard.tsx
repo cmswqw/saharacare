@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Activity, CalendarCheck2, Plus } from "lucide-react";
+import { CalendarCheck2, Plus } from "lucide-react";
 import { AdherenceSummaryCard } from "@/components/analytics/AdherenceSummaryCard";
 import { TodayDoseTimeline } from "@/components/doses/TodayDoseTimeline";
 import { MedicationHistory } from "@/components/history/MedicationHistory";
 import { CurrentMedicineCard } from "@/components/medicine/CurrentMedicineCard";
-import { ContactsSection } from "@/components/contacts/ContactsSection";
-import { PatientLinkingCard } from "@/components/linking/PatientLinkingCard";
+import { CaregiverStatusCard, QuickActionsCard, TodayProgressCard, UpcomingRemindersCard } from "@/components/patient/PatientDashboardSections";
 import { useApp } from "@/components/providers/AppProvider";
 import { useCurrentUser } from "@/components/providers/CurrentUserProvider";
 import { Button } from "@/components/ui/Button";
@@ -24,20 +23,18 @@ import type {
 
 export function PatientDashboard({
   medications,
-  linkingCode,
   caregiverLinks,
   todayDoses,
   weeklyAdherence,
   recentHistory,
 }: {
   medications: Medication[];
-  linkingCode: string;
   caregiverLinks: LinkedCaregiver[];
   todayDoses: TodayDose[];
   weeklyAdherence: AdherenceSummary;
   recentHistory: DoseHistoryItem[];
 }) {
-  const { t, activities, language } = useApp();
+  const { t, language } = useApp();
   const profile = useCurrentUser();
   const activeMedications = medications.filter((medication) => medication.active);
   const currentDose = todayDoses.find((dose) => dose.status !== "taken")
@@ -70,8 +67,15 @@ export function PatientDashboard({
         </Card>
       )}
 
+      <div className="grid gap-6 xl:grid-cols-2">
+        <UpcomingRemindersCard doses={todayDoses} />
+        <TodayProgressCard doses={todayDoses} />
+        <CaregiverStatusCard links={caregiverLinks} />
+        <QuickActionsCard />
+      </div>
+
       {todayDoses.length > 0 ? (
-        <section>
+        <section id="today-schedule" className="scroll-mt-24">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="eyebrow">
@@ -88,27 +92,6 @@ export function PatientDashboard({
       <AdherenceSummaryCard summary={weeklyAdherence} />
 
       <MedicationHistory history={recentHistory} />
-
-      <PatientLinkingCard linkingCode={linkingCode} links={caregiverLinks} />
-
-      <ContactsSection />
-
-      <section>
-        <div className="mb-5">
-          <p className="eyebrow">{t("latestUpdates")}</p>
-          <h2 className="section-title mt-1">{t("recentActivity")}</h2>
-        </div>
-        <Card className="divide-y p-2">
-          {activities.slice(0, 3).map((activity, index) => (
-            <div key={`${activity}-${index}`} className="flex items-center gap-4 p-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-100 text-primary">
-                <Activity />
-              </span>
-              <p className="font-semibold">{t(activity)}</p>
-            </div>
-          ))}
-        </Card>
-      </section>
     </div>
   );
 }

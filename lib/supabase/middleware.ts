@@ -40,6 +40,7 @@ export async function updateSession(request: NextRequest) {
   const protectedRoute = request.nextUrl.pathname.startsWith("/patient")
     || request.nextUrl.pathname.startsWith("/caregiver")
     || request.nextUrl.pathname.startsWith("/doctor")
+    || request.nextUrl.pathname.startsWith("/admin")
     || request.nextUrl.pathname.startsWith("/settings");
 
   if (!user && protectedRoute) {

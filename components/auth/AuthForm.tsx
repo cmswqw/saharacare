@@ -76,7 +76,7 @@ export function AuthForm({
     if (
       profileError
       || !data
-      || (data.role !== "patient" && data.role !== "caregiver" && data.role !== "doctor")
+      || (data.role !== "patient" && data.role !== "caregiver" && data.role !== "doctor" && data.role !== "admin")
     ) {
       throw new Error("auth_profile_unavailable");
     }

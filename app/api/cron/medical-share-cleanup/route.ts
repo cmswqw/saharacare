@@ -1,20 +1,13 @@
-import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
+import { hasValidCronSecret } from "@/lib/cron";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MEDICAL_FILE_BUCKET } from "@/lib/medical-files/config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function validSecret(request: Request) {
-  const expected = process.env.CRON_SECRET;
-  const received = request.headers.get("authorization")?.replace(/^Bearer\s+/iu, "") ?? "";
-  if (!expected || expected.length !== received.length) return false;
-  return timingSafeEqual(Buffer.from(expected), Buffer.from(received));
-}
-
 export async function GET(request: Request) {
-  if (!validSecret(request)) return NextResponse.json({ ok: false }, { status: 401 });
+  if (!hasValidCronSecret(request)) return NextResponse.json({ ok: false }, { status: 401 });
   try {
     const admin = createAdminClient();
     const now = new Date().toISOString();

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HeartPulse, Settings } from "lucide-react";
-import { patientNavigation } from "@/constants/navigation";
+import { patientNavigationSections } from "@/constants/navigation";
 import { useApp } from "@/components/providers/AppProvider";
 import { cn } from "@/lib/utils";
 
@@ -19,26 +19,29 @@ export function PatientSidebar() {
         </span>
         <span className="text-2xl font-extrabold">SaharaCare</span>
       </Link>
-      <nav aria-label={t("patientNavigation")} className="space-y-2">
-        {patientNavigation.map(({ href, label, icon: Icon }) => {
-          const active = href === "/patient" ? pathname === href : pathname.startsWith(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "flex min-h-16 items-center gap-4 rounded-2xl px-4 text-lg font-bold transition-colors",
-                active
-                  ? "bg-blue-50 text-primary dark:bg-blue-950/50"
-                  : "text-muted hover:bg-slate-100 dark:hover:bg-slate-800",
-              )}
-              aria-current={active ? "page" : undefined}
-            >
-              <Icon className="h-6 w-6" aria-hidden="true" />
-              {t(label)}
-            </Link>
-          );
-        })}
+      <nav aria-label={t("patientNavigation")} className="space-y-6">
+        {patientNavigationSections.map((section) => <div key={section.label}>
+          <p className="mb-2 px-4 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">{t(section.label)}</p>
+          <div className="space-y-1">{section.items.map(({ href, label, icon: Icon }) => {
+            const active = href === "/patient" ? pathname === href : pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex min-h-14 items-center gap-4 rounded-2xl px-4 text-base font-bold transition-colors",
+                  active
+                    ? "bg-blue-50 text-primary dark:bg-blue-950/50"
+                    : "text-muted hover:bg-slate-100 dark:hover:bg-slate-800",
+                )}
+                aria-current={active ? "page" : undefined}
+              >
+                <Icon className="h-5 w-5" aria-hidden="true" />
+                {t(label)}
+              </Link>
+            );
+          })}</div>
+        </div>)}
       </nav>
       <div className="mt-auto">
         <Link

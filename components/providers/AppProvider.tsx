@@ -24,9 +24,6 @@ type AppContextValue = {
   setHighContrast: (enabled: boolean) => void;
   reducedMotion: boolean;
   setReducedMotion: (enabled: boolean) => void;
-  reminderSound: boolean;
-  setReminderSound: (enabled: boolean) => void;
-  activities: TranslationKey[];
   toast: (message: string, tone?: "success" | "info" | "warning") => void;
 };
 
@@ -38,11 +35,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [reminderSound, setReminderSound] = useState(true);
-  const [activities] = useState<TranslationKey[]>([
-    "activityAppointmentRequested",
-    "activityReminderDelayed",
-  ]);
   const [toastState, setToastState] = useState<ToastState>(null);
 
   useEffect(() => {
@@ -89,17 +81,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setHighContrast,
     reducedMotion,
     setReducedMotion,
-    reminderSound,
-    setReminderSound,
-    activities,
     toast,
   }), [
-    activities,
     darkMode,
     highContrast,
     language,
     reducedMotion,
-    reminderSound,
     setLanguage,
     setTextSize,
     textSize,

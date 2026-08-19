@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   if (
     profileError
     || !profile
-    || (profile.role !== "patient" && profile.role !== "caregiver" && profile.role !== "doctor")
+    || (profile.role !== "patient" && profile.role !== "caregiver" && profile.role !== "doctor" && profile.role !== "admin")
   ) {
     redirect("/login?error=profile");
   }

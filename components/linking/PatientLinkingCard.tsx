@@ -30,7 +30,7 @@ export function PatientLinkingCard({
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card id="caregiver-access" className="scroll-mt-24 overflow-hidden">
       <div className="border-b bg-blue-50 p-5 dark:bg-blue-950/30 md:p-6">
         <div className="flex items-start gap-4">
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white text-primary dark:bg-slate-900">

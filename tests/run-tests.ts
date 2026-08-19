@@ -1,8 +1,10 @@
 import "./adherence.test";
+import "./admin-security.test";
 import "./chat-contracts.test";
 import "./chat-provider.test";
 import "./chat-safety.test";
 import "./dose-config.test";
 import "./medical-files.test";
 import "./medical-kyc.test";
+import "./push-notifications.test";
 import "./ui-localization.test";
