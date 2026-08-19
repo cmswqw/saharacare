@@ -60,11 +60,13 @@ test("medicine dialog is constrained to the dynamic viewport and scrolls interna
   assert.match(medicationForm, /min-h-14 min-w-0 flex-1/);
 });
 
-test("quick actions span the desktop dashboard grid and contain localized labels", () => {
+test("quick actions stay mounted in the dashboard and contain localized labels", () => {
   const sections = source("components/patient/PatientDashboardSections.tsx");
+  const dashboard = source("components/patient/PatientDashboard.tsx");
 
-  assert.match(sections, /xl:col-span-2/);
-  assert.match(sections, /grid-cols-1 gap-4 min-\[375px\]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-5/);
+  assert.match(dashboard, /<QuickActionsCard\s*\/>/);
+  assert.doesNotMatch(sections, /xl:col-span-2/);
+  assert.match(sections, /grid-cols-1 gap-4 min-\[375px\]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3/);
   assert.match(sections, /min-h-32 min-w-0 w-full/);
   assert.match(sections, /leading-tight whitespace-normal break-words \[overflow-wrap:anywhere\]/);
   assert.match(sections, /focus-visible:ring-4/);

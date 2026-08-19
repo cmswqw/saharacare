@@ -108,15 +108,15 @@ export function QuickActionsCard() {
   ];
 
   return (
-    <Card className="p-5 md:p-6 xl:col-span-2">
+    <Card className="min-w-0 p-5 md:p-6">
       <p className="eyebrow">{t("shortcuts")}</p>
       <h2 className="mt-1 text-2xl font-extrabold">{t("quickActions")}</h2>
-      <div className="mt-5 grid grid-cols-1 gap-4 min-[375px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+      <div className="mt-5 grid grid-cols-1 gap-4 min-[375px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3">
         {actions.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
-            className="flex min-h-32 min-w-0 w-full flex-col items-center justify-center gap-3 rounded-2xl border bg-slate-50 px-2 py-4 text-center text-lg font-extrabold leading-tight whitespace-normal break-words [overflow-wrap:anywhere] transition-colors hover:border-primary/40 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 sm:p-4 sm:text-[inherit] dark:bg-slate-900 dark:hover:bg-blue-950/40"
+            className="flex min-h-32 min-w-0 w-full flex-col items-center justify-center gap-3 rounded-2xl border bg-slate-50 px-2 py-4 text-center text-lg font-extrabold leading-tight whitespace-normal break-words [overflow-wrap:anywhere] transition-colors hover:border-primary/40 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 sm:px-3 dark:bg-slate-900 dark:hover:bg-blue-950/40"
             aria-label={t(label)}
           >
             <Icon className="h-7 w-7 shrink-0 text-primary" aria-hidden="true" />
