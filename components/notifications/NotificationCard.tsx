@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { CheckCheck, Clock3, Pill, TriangleAlert } from "lucide-react";
+import { CalendarCheck2, CalendarClock, CalendarX2, CheckCheck, Clock3, Pill, TriangleAlert } from "lucide-react";
 import { markNotificationReadAction } from "@/app/actions/notifications";
 import { Button } from "@/components/ui/Button";
 import { formatDoseDate, formatDoseTimestamp } from "@/lib/dose-config";
@@ -15,12 +15,24 @@ const icons = {
   medication_taken: Pill,
   medication_late: Clock3,
   medication_missed: TriangleAlert,
+  appointment_booked: CalendarCheck2,
+  appointment_rescheduled: CalendarClock,
+  appointment_cancelled: CalendarX2,
 };
 
 export function NotificationCard({ notification }: { notification: AppNotification }) {
   const { language, t } = useApp();
   const [state, action, pending] = useActionState(markNotificationReadAction, initialState);
   const Icon = icons[notification.type];
+  const appointmentMessage = notification.type === "appointment_booked"
+    ? t("appointmentBookedNotification")
+    : notification.type === "appointment_rescheduled"
+      ? t("appointmentRescheduledNotification")
+      : notification.type === "appointment_cancelled"
+        ? t("appointmentCancelledNotification")
+        : null;
+  const title = appointmentMessage ? t("appointmentNotificationTitle") : notification.title;
+  const message = appointmentMessage ?? notification.message;
 
   return (
     <article className={cn(
@@ -32,12 +44,12 @@ export function NotificationCard({ notification }: { notification: AppNotificati
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <h3 className="text-lg font-extrabold">{notification.title}</h3>
+          <h3 className="text-lg font-extrabold">{title}</h3>
           {!notification.read ? (
             <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">{t("unread")}</span>
           ) : null}
         </div>
-        <p className="mt-2 text-base leading-relaxed text-muted">{notification.message}</p>
+        <p className="mt-2 text-base leading-relaxed text-muted">{message}</p>
         <p className="mt-2 text-sm font-semibold text-muted">
           {formatDoseDate(notification.created_at, language)} · {formatDoseTimestamp(notification.created_at, language)}
         </p>

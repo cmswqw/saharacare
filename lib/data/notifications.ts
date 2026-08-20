@@ -2,17 +2,20 @@ import "server-only";
 
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import type { AppNotification, MedicationNotificationType } from "@/types";
+import type { AppNotification, AppNotificationType } from "@/types";
 
 type DataResult<T> = {
   data: T;
   error: string | null;
 };
 
-function isMedicationNotificationType(value: string): value is MedicationNotificationType {
+function isAppNotificationType(value: string): value is AppNotificationType {
   return value === "medication_taken"
     || value === "medication_late"
-    || value === "medication_missed";
+    || value === "medication_missed"
+    || value === "appointment_booked"
+    || value === "appointment_rescheduled"
+    || value === "appointment_cancelled";
 }
 
 export async function getNotificationsForCurrentUser(): Promise<DataResult<AppNotification[]>> {
@@ -29,7 +32,7 @@ export async function getNotificationsForCurrentUser(): Promise<DataResult<AppNo
 
   return {
     data: (data ?? []).flatMap((row) => (
-      isMedicationNotificationType(row.type) ? [{
+      isAppNotificationType(row.type) ? [{
         id: row.id,
         patient_id: row.patient_id,
         type: row.type,

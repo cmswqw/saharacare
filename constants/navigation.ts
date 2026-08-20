@@ -1,4 +1,4 @@
-import { Bell, Bot, CalendarDays, FileHeart, HeartPulse, Home, LayoutDashboard, Pill, Settings, UserRound } from "lucide-react";
+import { Bell, Bot, CalendarClock, CalendarDays, FileHeart, HeartPulse, Home, LayoutDashboard, Pill, Settings, UserRound } from "lucide-react";
 
 export const patientNavigation = [
   { href: "/patient", label: "dashboard" as const, icon: Home },
@@ -23,6 +23,7 @@ export const caregiverNavigation = [
 
 export const doctorNavigation = [
   { href: "/doctor", label: "appointments" as const, icon: CalendarDays },
+  { href: "/doctor/availability", label: "availability" as const, icon: CalendarClock },
   { href: "/settings", label: "settings" as const, icon: Settings },
 ];
 

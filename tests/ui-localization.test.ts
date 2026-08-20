@@ -81,6 +81,23 @@ test("quick actions stay mounted in the dashboard and contain localized labels",
   }
 });
 
+test("appointment booking and doctor availability use responsive accessible controls", () => {
+  const slots = source("components/appointments/AvailableSlotPicker.tsx");
+  const calendar = source("components/appointments/DoctorAvailabilityManager.tsx");
+  const caregiverAppointments = source("components/appointments/CaregiverAppointmentsSection.tsx");
+  const mobileNavigation = source("components/layout/MobileRoleNavigation.tsx");
+  const navigation = source("constants/navigation.ts");
+
+  assert.match(slots, /grid grid-cols-2 gap-3 sm:grid-cols-3/);
+  assert.match(slots, /focus-within:ring-4/);
+  assert.match(slots, /aria-live="polite"/);
+  assert.match(calendar, /grid gap-5 xl:grid-cols-2/);
+  assert.match(calendar, /sm:grid-cols-2 lg:grid-cols-4/);
+  assert.match(caregiverAppointments, /viewer="caregiver"/);
+  assert.match(mobileNavigation, /break-words leading-tight/);
+  assert.match(navigation, /\/doctor\/availability/);
+});
+
 test("TSX does not contain unreviewed hard-coded English JSX labels", () => {
   const files: string[] = [];
   const allowed = new Set(["SaharaCare", "English", "Maya Sharma", "SC-XXXXXXXXXX"]);

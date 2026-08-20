@@ -140,6 +140,7 @@ export type Contact = {
 };
 
 export type AppointmentStatus = "requested" | "confirmed" | "completed" | "cancelled";
+export type AppointmentActorRole = "patient" | "caregiver";
 
 export type Appointment = {
   id: string;
@@ -153,7 +154,39 @@ export type Appointment = {
   starts_at: string;
   ends_at: string;
   status: AppointmentStatus;
+  created_by: string;
+  created_by_role: AppointmentActorRole;
+  created_by_name: string;
+  updated_by: string | null;
+  cancelled_by: string | null;
+  cancelled_at: string | null;
   created_at: string;
+};
+
+export type AvailableAppointmentSlot = {
+  starts_at: string;
+  ends_at: string;
+};
+
+export type DoctorAvailability = {
+  id: string;
+  doctor_id: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DoctorAvailabilityOverride = {
+  id: string;
+  doctor_id: string;
+  override_date: string;
+  override_type: "unavailable" | "custom_hours";
+  start_time: string | null;
+  end_time: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type AppointmentMedicalShare = {
@@ -180,9 +213,16 @@ export type MedicationNotificationType =
   | "medication_late"
   | "medication_missed";
 
+export type AppointmentNotificationType =
+  | "appointment_booked"
+  | "appointment_rescheduled"
+  | "appointment_cancelled";
+
+export type AppNotificationType = MedicationNotificationType | AppointmentNotificationType;
+
 export type AppNotification = {
   id: string;
-  type: MedicationNotificationType;
+  type: AppNotificationType;
   title: string;
   message: string;
   read: boolean;

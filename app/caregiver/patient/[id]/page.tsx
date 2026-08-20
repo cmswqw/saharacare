@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Pill, UserRound } from "lucide-react";
 import { AdherenceSummaryCard } from "@/components/analytics/AdherenceSummaryCard";
+import { CaregiverAppointmentsSection } from "@/components/appointments/CaregiverAppointmentsSection";
 import { TodayDoseTimeline } from "@/components/doses/TodayDoseTimeline";
 import { MedicationHistory } from "@/components/history/MedicationHistory";
 import { CaregiverDoseRealtime } from "@/components/realtime/CaregiverDoseRealtime";
@@ -10,6 +11,7 @@ import { DataErrorState } from "@/components/ui/DataState";
 import { LocalizedDateTime } from "@/components/ui/LocalizedDateTime";
 import { TranslatedText } from "@/components/ui/TranslatedText";
 import { getLinkedPatientByCode } from "@/lib/data/phase4";
+import { getAppointments, getDoctors } from "@/lib/data/appointments";
 
 export default async function CaregiverPatientPage({
   params,
@@ -25,6 +27,16 @@ export default async function CaregiverPatientPage({
   if (!result.data || !result.data.full_name) notFound();
 
   const patient = result.data;
+  if (!patient.patient_id) notFound();
+  const patientId = patient.patient_id;
+  const patientName = patient.full_name ?? "";
+  const [appointments, doctors] = await Promise.all([
+    getAppointments(patientId),
+    getDoctors(),
+  ]);
+  if (appointments.error || doctors.error) {
+    return <DataErrorState messageKey="appointmentsError" />;
+  }
   const realtimePatients = patient.patient_id
     ? [{
         patientId: patient.patient_id,
@@ -70,6 +82,12 @@ export default async function CaregiverPatientPage({
       </Card>
 
       <AdherenceSummaryCard summary={patient.weekly_adherence} />
+
+      <CaregiverAppointmentsSection
+        patient={{ id: patientId, full_name: patientName }}
+        appointments={appointments.data}
+        doctors={doctors.data}
+      />
 
       <MedicationHistory history={patient.recent_history} />
     </div>

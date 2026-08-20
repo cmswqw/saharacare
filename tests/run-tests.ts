@@ -1,5 +1,6 @@
 import "./adherence.test";
 import "./admin-security.test";
+import "./appointments.test";
 import "./chat-contracts.test";
 import "./chat-provider.test";
 import "./chat-safety.test";

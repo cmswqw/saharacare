@@ -22,7 +22,7 @@ export function NotificationCenter({ notifications }: { notifications: AppNotifi
     return (
       <Card className="py-16 text-center">
         <BellOff className="mx-auto h-14 w-14 text-muted" />
-        <h2 className="mt-4 text-2xl font-extrabold">{t("noMedicationNotifications")}</h2>
+        <h2 className="mt-4 text-2xl font-extrabold">{t("noNotifications")}</h2>
         <p className="mt-2 text-lg text-muted">{t("notificationEmptyHelp")}</p>
       </Card>
     );
