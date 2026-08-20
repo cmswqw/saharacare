@@ -29,6 +29,20 @@ type ActionActor = {
   role: UserRole;
 };
 
+type AuthenticatedActionContext = {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  actor: ActionActor;
+};
+
+type AppointmentBookingInput = {
+  patientId: string;
+  doctorId: string;
+  startsAt: string;
+  facility: string;
+  purpose: string;
+  note: string | null;
+};
+
 const idleError = "The appointment could not be updated. Please try again.";
 
 function result(
@@ -68,6 +82,49 @@ async function getActionActor(allowedRoles: UserRole[]) {
     actor: { id: profile.id, role: profile.role as UserRole } satisfies ActionActor,
     error: null,
   };
+}
+
+async function resolveBookingPatientId(
+  context: AuthenticatedActionContext,
+  requestedPatientId: string,
+) {
+  if (context.actor.role === "patient") {
+    return { patientId: context.actor.id, error: null };
+  }
+
+  if (context.actor.role !== "caregiver" || !isAppointmentUuid(requestedPatientId)) {
+    return { patientId: null, error: "Choose an approved linked patient." };
+  }
+
+  const { data: link, error } = await context.supabase
+    .from("caregiver_links")
+    .select("id")
+    .eq("caregiver_id", context.actor.id)
+    .eq("patient_id", requestedPatientId)
+    .eq("status", "accepted")
+    .maybeSingle();
+
+  if (error || !link) {
+    return { patientId: null, error: "You can only book for an approved linked patient." };
+  }
+
+  return { patientId: requestedPatientId, error: null };
+}
+
+async function createAppointmentForActor(
+  context: AuthenticatedActionContext,
+  input: AppointmentBookingInput,
+) {
+  // The RPC derives created_by, created_by_role, and updated_by from auth.uid()
+  // and the verified profile. Actor audit fields are never accepted from FormData.
+  return context.supabase.rpc("book_appointment", {
+    appointment_patient_id: input.patientId,
+    appointment_doctor_id: input.doctorId,
+    appointment_starts_at: input.startsAt,
+    appointment_facility: input.facility,
+    appointment_purpose: input.purpose,
+    appointment_note: input.note,
+  });
 }
 
 function appointmentError(error: { code?: string; message?: string }) {
@@ -155,10 +212,21 @@ export async function bookAppointmentAction(
 ): Promise<AppointmentActionState> {
   const context = await getActionActor(["patient", "caregiver"]);
   if (!context.actor) return result("error", context.error ?? idleError);
+  const actorContext: AuthenticatedActionContext = {
+    supabase: context.supabase,
+    actor: context.actor,
+  };
 
   const doctorId = String(formData.get("doctorId") ?? "");
-  const browserPatientId = String(formData.get("patientId") ?? "");
-  const patientId = context.actor.role === "patient" ? context.actor.id : browserPatientId;
+  const requestedPatientId = String(formData.get("patientId") ?? "");
+  const bookingPatient = await resolveBookingPatientId(
+    actorContext,
+    requestedPatientId,
+  );
+  if (!bookingPatient.patientId) {
+    return result("error", bookingPatient.error ?? idleError);
+  }
+  const patientId = bookingPatient.patientId;
   const startsAt = String(formData.get("startsAt") ?? "");
   const facility = String(formData.get("facility") ?? "").trim();
   const purpose = String(formData.get("purpose") ?? "").trim();
@@ -177,27 +245,17 @@ export async function bookAppointmentAction(
     return result("error", "Choose a patient, doctor, free time, clinic, and reason.");
   }
 
-  if (context.actor.role === "caregiver") {
-    const { data: link, error: linkError } = await context.supabase
-      .from("caregiver_links")
-      .select("id")
-      .eq("caregiver_id", context.actor.id)
-      .eq("patient_id", patientId)
-      .eq("status", "accepted")
-      .maybeSingle();
-    if (linkError || !link) {
-      return result("error", "You can only book for an approved linked patient.");
-    }
-  }
-
-  const { data, error } = await context.supabase.rpc("book_appointment", {
-    appointment_patient_id: patientId,
-    appointment_doctor_id: doctorId,
-    appointment_starts_at: startsAt,
-    appointment_facility: facility,
-    appointment_purpose: purpose,
-    appointment_note: note || null,
-  });
+  const { data, error } = await createAppointmentForActor(
+    actorContext,
+    {
+      patientId,
+      doctorId,
+      startsAt,
+      facility,
+      purpose,
+      note: note || null,
+    },
+  );
   if (error) {
     logMutationError("book_appointment_failed", error);
     return result("error", appointmentError(error));
@@ -207,8 +265,8 @@ export async function bookAppointmentAction(
   }
 
   await notifyPatientAfterCaregiverAction(
-    context.supabase,
-    context.actor,
+    actorContext.supabase,
+    actorContext.actor,
     data,
     "appointment_booked",
   );

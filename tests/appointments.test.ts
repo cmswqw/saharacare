@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -17,7 +17,27 @@ const migration = readFileSync(resolve(
   projectRoot,
   "supabase/migrations/20260819222740_implement_doctor_availability_and_caregiver_appointments.sql",
 ), "utf8");
+const availabilityTriggerRepair = readFileSync(resolve(
+  projectRoot,
+  "supabase/migrations/20260820131745_repair_doctor_availability_trigger.sql",
+), "utf8");
 const actions = readFileSync(resolve(projectRoot, "app/actions/appointments.ts"), "utf8");
+const requestForm = readFileSync(resolve(
+  projectRoot,
+  "components/appointments/AppointmentRequestForm.tsx",
+), "utf8");
+
+function sourceFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = resolve(directory, entry.name);
+    if (entry.isDirectory()) return sourceFiles(path);
+    return /\.(?:ts|tsx)$/u.test(entry.name) ? [path] : [];
+  });
+}
+
+const applicationSources = ["app", "components", "lib"].flatMap((directory) => (
+  sourceFiles(resolve(projectRoot, directory))
+));
 
 test("appointment time configuration is explicit and Kathmandu-aware", () => {
   assert.equal(APPOINTMENT_SLOT_MINUTES, 30);
@@ -39,6 +59,14 @@ test("doctor availability is doctor-owned, RLS-enabled, and never raw-readable b
   assert.match(migration, /doctor_id = \(select auth\.uid\(\)\)/i);
   assert.match(migration, /revoke all on table[\s\S]*public\.doctor_availability[\s\S]*from anon, authenticated/i);
   assert.doesNotMatch(migration, /create policy[^;]+doctor_availability[^;]+to anon/i);
+});
+
+test("availability trigger validates weekly and override rows without cross-table fields", () => {
+  assert.match(availabilityTriggerRepair, /create or replace function private\.validate_doctor_availability_role/i);
+  assert.match(availabilityTriggerRepair, /if tg_table_name = 'doctor_availability' then[\s\S]+new\.day_of_week/i);
+  assert.match(availabilityTriggerRepair, /elsif tg_table_name = 'doctor_availability_overrides' then[\s\S]+new\.override_type/i);
+  assert.doesNotMatch(availabilityTriggerRepair, /tg_table_name = 'doctor_availability_overrides'\s+and new\.override_type/i);
+  assert.match(availabilityTriggerRepair, /revoke all on function private\.validate_doctor_availability_role\(\)[\s\S]+from public, anon, authenticated/i);
 });
 
 test("slot generation is deterministic, Kathmandu-aware, and removes blocked and booked time", () => {
@@ -66,11 +94,36 @@ test("booking and rescheduling use authenticated atomic RPCs with a collision ke
 });
 
 test("patient ownership is derived server-side and appointment actions expose no service key", () => {
-  assert.match(actions, /context\.actor\.role === "patient" \? context\.actor\.id : browserPatientId/);
+  assert.match(actions, /context\.actor\.role === "patient"[\s\S]+patientId: context\.actor\.id/);
   assert.match(actions, /\.eq\("caregiver_id", context\.actor\.id\)/);
   assert.match(actions, /\.eq\("status", "accepted"\)/);
   assert.match(actions, /\.rpc\("book_appointment"/);
   assert.doesNotMatch(actions, /createAdminClient|SUPABASE_SECRET_KEY|service_role/);
+});
+
+test("all patient and caregiver forms share the authenticated appointment RPC", () => {
+  assert.match(requestForm, /useActionState\(bookAppointmentAction,/);
+  assert.match(requestForm, /mode\?: "patient" \| "caregiver"/);
+  assert.match(actions, /requestAppointmentAction[\s\S]+return bookAppointmentAction\(previousState, formData\)/);
+  assert.equal(actions.match(/\.rpc\("book_appointment"/gu)?.length, 1);
+});
+
+test("application code cannot restore a direct appointments table mutation", () => {
+  const directAppointmentMutation = /\.from\(["']appointments["']\)(?:(?!;)[\s\S])*?\.(?:insert|upsert|update|delete)\(/u;
+  const offenders = applicationSources.flatMap((path) => {
+    const source = readFileSync(path, "utf8");
+    return directAppointmentMutation.test(source) ? [path.slice(projectRoot.length + 1)] : [];
+  });
+  assert.deepEqual(offenders, []);
+});
+
+test("appointment actor audit is database-derived for create, reschedule, and cancel", () => {
+  assert.match(migration, /actor_id uuid := \(select auth\.uid\(\)\)/i);
+  assert.match(migration, /created_by,\s*created_by_role,\s*updated_by[\s\S]+actor_id,\s*actor_role,\s*actor_id/i);
+  assert.match(migration, /set\s+starts_at[\s\S]+updated_by = actor_id/i);
+  assert.match(migration, /status = 'cancelled'[\s\S]+cancelled_by = actor_id[\s\S]+cancelled_at = statement_timestamp\(\)[\s\S]+updated_by = actor_id/i);
+  assert.match(migration, /\(select auth\.uid\(\)\) is not null/i);
+  assert.doesNotMatch(actions, /formData\.get\(["'](?:createdBy|created_by|createdByRole|created_by_role|updatedBy|updated_by|cancelledBy|cancelled_by)["']\)/i);
 });
 
 test("caregivers can only read appointments through an accepted patient link", () => {
