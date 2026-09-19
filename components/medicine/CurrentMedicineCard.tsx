@@ -25,7 +25,7 @@ export function CurrentMedicineCard({ dose }: { dose: TodayDose }) {
     && minutesUntilDose > -15;
 
   return (
-    <Card className="overflow-hidden border-blue-100">
+    <Card className="overflow-hidden border-blue-200">
       <div className={`px-5 py-4 ${
         urgent
           ? "bg-amber-50 dark:bg-amber-950/30"
@@ -44,12 +44,12 @@ export function CurrentMedicineCard({ dose }: { dose: TodayDose }) {
         </div>
       </div>
       <div className="p-5 md:p-7">
-        <div className="grid grid-cols-[64px_1fr] gap-4 md:grid-cols-[76px_1fr] md:gap-5">
-          <div className="grid h-16 w-16 place-items-center rounded-2xl bg-blue-50 text-primary dark:bg-blue-950 md:h-[76px] md:w-[76px]" aria-label={t("medicationIllustration")}>
+        <div className="grid grid-cols-[56px_1fr] gap-4 min-[380px]:grid-cols-[64px_1fr] md:grid-cols-[76px_1fr] md:gap-5">
+          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-50 text-primary min-[380px]:h-16 min-[380px]:w-16 dark:bg-blue-950 md:h-[76px] md:w-[76px]" aria-label={t("medicationIllustration")}>
             <Pill className="h-9 w-9 rotate-45 md:h-11 md:w-11" strokeWidth={1.75} />
           </div>
           <div className="min-w-0">
-            <h2 className="text-2xl font-extrabold md:text-4xl">{dose.medication.name}</h2>
+            <h2 className="break-words text-2xl font-extrabold leading-tight md:text-4xl">{dose.medication.name}</h2>
             <p className="mt-1 text-lg font-semibold text-primary md:text-xl">{dose.medication.dosage}</p>
             <p className="mt-4 flex items-center gap-2 font-bold">
               <Clock3 className="h-6 w-6 text-muted" />

@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { canManageAppointmentMedicalShare } from "@/lib/medical-files/authorization";
+import { isSameOriginMutation } from "@/lib/notifications/subscription";
 import type { AppointmentStatus } from "@/types";
 
-export async function DELETE(_: Request, context: { params: Promise<{ shareId: string }> }) {
+export async function DELETE(request: Request, context: { params: Promise<{ shareId: string }> }) {
+  if (!isSameOriginMutation(request)) return NextResponse.json({ ok: false, message: "This request is not allowed." }, { status: 403 });
   const { shareId } = await context.params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -18,7 +20,16 @@ export async function DELETE(_: Request, context: { params: Promise<{ shareId: s
     if (!share) return NextResponse.json({ ok: false, message: "The share was not found." }, { status: 404 });
     const { data: appointment } = await admin.from("appointments").select("patient_id, status").eq("id", share.appointment_id).maybeSingle();
     if (!appointment || !canManageAppointmentMedicalShare({ userId: user.id, role: "patient", patientId: appointment.patient_id, appointmentStatus: appointment.status as AppointmentStatus })) return NextResponse.json({ ok: false, message: "You cannot revoke this share." }, { status: 403 });
-    if (!share.revoked_at) await admin.from("appointment_medical_shares").update({ revoked_at: new Date().toISOString() }).eq("id", shareId);
+    if (!share.revoked_at) {
+      const { data: revokedShare, error: revokeError } = await admin.from("appointment_medical_shares")
+        .update({ revoked_at: new Date().toISOString() })
+        .eq("id", shareId)
+        .select("id, revoked_at")
+        .maybeSingle();
+      if (revokeError || !revokedShare?.revoked_at) {
+        return NextResponse.json({ ok: false, message: "The share could not be revoked. Please try again." }, { status: 500 });
+      }
+    }
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false, message: "The share could not be revoked." }, { status: 500 });

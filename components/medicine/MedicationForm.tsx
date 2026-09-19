@@ -11,7 +11,7 @@ import type { Medication, Phase4ActionState } from "@/types";
 
 const initialState: Phase4ActionState = { status: "idle", message: "" };
 
-const fieldClassName = "mt-2 min-h-14 w-full rounded-2xl border-2 bg-card px-4 text-base";
+const fieldClassName = "mt-2 min-h-14 w-full rounded-2xl border-2 border-border bg-card px-4 text-base transition-colors focus:border-primary";
 
 export function MedicationForm({
   medication,

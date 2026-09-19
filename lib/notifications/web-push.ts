@@ -2,6 +2,7 @@ import "server-only";
 
 import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isAllowedPushEndpoint } from "@/lib/notifications/subscription";
 import {
   MEDICATION_REMINDER_BATCH_SIZE,
   MEDICATION_REMINDER_LEAD_MINUTES,
@@ -77,6 +78,19 @@ export async function dispatchMedicationReminders() {
   for (let index = 0; index < reminders.length; index += 10) {
     const batch = reminders.slice(index, index + 10);
     await Promise.all(batch.map(async (reminder) => {
+      // Revalidate stored subscriptions too: older or corrupted rows must not
+      // bypass the enrollment check and reach an internal/arbitrary address.
+      if (!isAllowedPushEndpoint(reminder.endpoint)) {
+        await admin.from("push_subscriptions")
+          .update({ disabled_at: new Date().toISOString() })
+          .eq("id", reminder.subscription_id);
+        await admin.from("medication_reminder_deliveries")
+          .update({ status: "failed", last_error: "push_endpoint_not_allowed" })
+          .eq("id", reminder.delivery_id);
+        failed += 1;
+        return;
+      }
+
       try {
         await webpush.sendNotification(
           {

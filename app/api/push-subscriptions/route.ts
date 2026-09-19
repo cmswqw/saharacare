@@ -6,6 +6,7 @@ import {
 } from "@/lib/notifications/subscription";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { readBoundedJson, RequestBodyError } from "@/lib/request-body";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,7 +38,13 @@ export async function POST(request: Request) {
   const patient = await authenticatedPatient();
   if (!patient.userId) return denied(patient.status);
 
-  const input = parsePushSubscriptionInput(await request.json().catch(() => null));
+  let body: unknown;
+  try {
+    body = await readBoundedJson(request, 4096);
+  } catch (error) {
+    return denied(error instanceof RequestBodyError ? error.status : 400);
+  }
+  const input = parsePushSubscriptionInput(body);
   if (!input) return denied(400);
 
   const admin = createAdminClient();
@@ -74,7 +81,13 @@ export async function DELETE(request: Request) {
   const patient = await authenticatedPatient();
   if (!patient.userId) return denied(patient.status);
 
-  const endpoint = parsePushEndpoint(await request.json().catch(() => null));
+  let body: unknown;
+  try {
+    body = await readBoundedJson(request, 4096);
+  } catch (error) {
+    return denied(error instanceof RequestBodyError ? error.status : 400);
+  }
+  const endpoint = parsePushEndpoint(body);
   if (!endpoint) return denied(400);
 
   const admin = createAdminClient();

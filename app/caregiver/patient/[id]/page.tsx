@@ -55,14 +55,14 @@ export default async function CaregiverPatientPage({
         <ArrowLeft /><TranslatedText translationKey="backToOverview" />
       </Link>
 
-      <Card className="p-6">
+      <Card className="bg-gradient-to-br from-white via-white to-blue-50 p-5 md:p-6 dark:from-card dark:via-card dark:to-blue-950/30">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           <span className="grid h-24 w-24 place-items-center rounded-3xl bg-blue-50 text-primary dark:bg-blue-950/40">
             <UserRound className="h-14 w-14" />
           </span>
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-bold uppercase tracking-widest text-primary"><TranslatedText translationKey="approvedPatientLabel" /></p>
-            <h1 className="mt-1 text-3xl font-extrabold">{patient.full_name}</h1>
+            <h1 className="mt-1 break-words text-3xl font-extrabold">{patient.full_name}</h1>
             <p className="mt-2 text-muted"><TranslatedText translationKey="readOnlyCaregiverInfo" /></p>
           </div>
         </div>

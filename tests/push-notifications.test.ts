@@ -4,7 +4,8 @@ import { dirname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { isSameOriginMutation, parsePushEndpoint, parsePushSubscriptionInput } from "@/lib/notifications/subscription";
+import { isAllowedPushEndpoint, isSameOriginMutation, parsePushEndpoint, parsePushSubscriptionInput } from "@/lib/notifications/subscription";
+import { loadServerModule } from "./server-module";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const migrationPath = "supabase/migrations/20260819093737_implement_medication_push_reminders.sql";
@@ -15,7 +16,7 @@ function source(relativePath: string) {
 
 test("push subscription input accepts only bounded HTTPS capability data", () => {
   const valid = {
-    endpoint: "https://push.example.test/subscription/123456789",
+    endpoint: "https://fcm.googleapis.com/fcm/send/synthetic-subscription",
     keys: { p256dh: "p".repeat(65), auth: "a".repeat(16) },
     language: "ne",
     soundEnabled: false,
@@ -27,6 +28,75 @@ test("push subscription input accepts only bounded HTTPS capability data", () =>
   assert.equal(parsePushSubscriptionInput({ ...valid, keys: { p256dh: "short", auth: "short" } }), null);
   assert.equal(parsePushEndpoint({ endpoint: valid.endpoint }), valid.endpoint);
   assert.equal(parsePushEndpoint({ endpoint: "javascript:alert(1)" }), null);
+});
+
+test("push requests are restricted to browser push services, not arbitrary HTTPS targets", () => {
+  for (const endpoint of [
+    "https://fcm.googleapis.com/wp/synthetic",
+    "https://updates.push.services.mozilla.com/wpush/v2/synthetic",
+    "https://web.push.apple.com/synthetic",
+    "https://sin.notify.windows.com/?token=synthetic",
+  ]) assert.equal(isAllowedPushEndpoint(endpoint), true, endpoint);
+
+  for (const endpoint of [
+    "https://127.0.0.1/private",
+    "https://[::1]/private",
+    "https://169.254.169.254/metadata",
+    "https://10.0.0.1/private",
+    "https://localhost/private",
+    "https://attacker.example/notification",
+    "https://fcm.googleapis.com.attacker.example/push",
+    "https://evilnotify.windows.com/push",
+    "https://fcm.googleapis.com@attacker.example/push",
+    "https://user:password@fcm.googleapis.com/push",
+    "https://fcm.googleapis.com:8443/push",
+    "https://fcm.googleapis.com/push#fragment",
+    "http://fcm.googleapis.com/push",
+  ]) {
+    assert.equal(isAllowedPushEndpoint(endpoint), false, endpoint);
+    assert.equal(parsePushEndpoint({ endpoint }), null, endpoint);
+    assert.equal(parsePushSubscriptionInput({
+      endpoint,
+      keys: { p256dh: "p".repeat(65), auth: "a".repeat(16) },
+      language: "en",
+      soundEnabled: true,
+    }), null, endpoint);
+  }
+});
+
+test("delivery rechecks legacy endpoints before invoking any push network client", async () => {
+  let sends = 0;
+  const updates: Array<{ table: string; values: Record<string, unknown> }> = [];
+  const admin = {
+    async rpc() {
+      return { data: [{
+        delivery_id: "delivery", subscription_id: "subscription",
+        endpoint: "https://127.0.0.1/private", p256dh: "synthetic", auth_key: "synthetic",
+        language: "en", sound_enabled: false,
+      }], error: null };
+    },
+    from(table: string) {
+      return { update(values: Record<string, unknown>) {
+        updates.push({ table, values });
+        return { async eq() { return { error: null }; } };
+      } };
+    },
+  };
+  const module = loadServerModule("lib/notifications/web-push.ts", {
+    "web-push": { async sendNotification() { sends += 1; } },
+    "@/lib/supabase/admin": { createAdminClient: () => admin },
+  }, {
+    VAPID_SUBJECT: "mailto:synthetic@example.invalid",
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY: "synthetic-public-key",
+    VAPID_PRIVATE_KEY: "synthetic-private-key",
+  });
+  const dispatch = module.dispatchMedicationReminders as () => Promise<{ claimed: number; failed: number }>;
+  const result = await dispatch();
+  assert.equal(sends, 0);
+  assert.equal(result.failed, 1);
+  assert.equal(updates[0].table, "push_subscriptions");
+  assert.equal(typeof updates[0].values.disabled_at, "string");
+  assert.equal(updates[1].values.last_error, "push_endpoint_not_allowed");
 });
 
 test("push subscription mutations require the browser origin to match the public request host", () => {

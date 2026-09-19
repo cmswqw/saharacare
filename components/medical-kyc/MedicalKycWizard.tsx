@@ -10,6 +10,7 @@ import {
   Plus,
   ShieldCheck,
   Trash2,
+  UsersRound,
 } from "lucide-react";
 import { useMedicalKyc } from "@/components/providers/MedicalKycProvider";
 import { Button } from "@/components/ui/Button";
@@ -26,7 +27,7 @@ import type {
   ThreeStateAnswer,
 } from "@/lib/medical-kyc/types";
 
-const fieldClass = "min-h-14 w-full rounded-2xl border-2 bg-card px-4 py-3 text-base font-semibold focus:border-primary";
+const fieldClass = "min-h-14 w-full rounded-2xl border-2 border-border bg-card px-4 py-3 text-base font-semibold transition-colors focus:border-primary";
 const commonConditions = [
   { value: "Diabetes", key: "kycConditionDiabetes" },
   { value: "High blood pressure", key: "kycConditionBloodPressure" },
@@ -79,7 +80,7 @@ function EntryEditor<T extends RepeatableEntry>({ entry, fields, onChange, onRem
   onRemove: () => void;
 }) {
   const { t } = useApp();
-  return <div className="rounded-2xl border bg-slate-50 p-4 dark:bg-slate-900/40"><div className="grid gap-4 sm:grid-cols-2">{fields.map((field) => <label key={String(field.key)} className="block"><span className="mb-2 block font-bold">{t(field.labelKey)}</span><input type={field.type ?? "text"} value={entry[field.key]} onChange={(event) => onChange({ ...entry, [field.key]: event.target.value })} className={fieldClass} placeholder={field.placeholderKey ? t(field.placeholderKey) : undefined} /></label>)}</div><Button type="button" variant="ghost" className="mt-3 text-red-700" onClick={onRemove}><Trash2 />{t("remove")}</Button></div>;
+  return <div className="rounded-2xl border border-blue-100 bg-blue-50/45 p-4 dark:bg-blue-950/20"><div className="grid gap-4 sm:grid-cols-2">{fields.map((field) => <label key={String(field.key)} className="block"><span className="mb-2 block font-bold">{t(field.labelKey)}</span><input type={field.type ?? "text"} value={entry[field.key]} onChange={(event) => onChange({ ...entry, [field.key]: event.target.value })} className={fieldClass} placeholder={field.placeholderKey ? t(field.placeholderKey) : undefined} /></label>)}</div><Button type="button" variant="ghost" className="mt-3 text-red-700" onClick={onRemove}><Trash2 />{t("remove")}</Button></div>;
 }
 
 function ReviewSection({ number, titleKey, lines, onEdit }: { number: number; titleKey: TranslationKey; lines: string[]; onEdit: () => void }) {
@@ -154,5 +155,38 @@ export function MedicalKycWizard({ fullName, medications }: { fullName: string; 
     return <div className="space-y-5"><div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-blue-950 dark:bg-blue-950/40 dark:text-blue-100"><div className="flex gap-3"><ShieldCheck className="mt-0.5 shrink-0" /><div><h3 className="font-extrabold">{t("kycDevicePrivacyTitle")}</h3><p className="mt-1">{t("kycDevicePrivacyBody")}</p></div></div></div><ReviewSection number={1} titleKey="kycStepBasics" lines={review.basics} onEdit={() => setStep(0)} /><ReviewSection number={2} titleKey="kycStepAllergies" lines={review.allergies} onEdit={() => setStep(1)} /><ReviewSection number={3} titleKey="kycStepConditions" lines={review.conditions} onEdit={() => setStep(2)} /><ReviewSection number={4} titleKey="kycStepMedications" lines={review.medications} onEdit={() => setStep(3)} /><ReviewSection number={5} titleKey="kycStepHistory" lines={review.history} onEdit={() => setStep(4)} /><ReviewSection number={6} titleKey="kycStepSurgeries" lines={review.surgeries} onEdit={() => setStep(5)} /><ReviewSection number={7} titleKey="kycStepHospital" lines={review.facilities} onEdit={() => setStep(6)} /><ReviewSection number={8} titleKey="kycStepFamily" lines={review.family} onEdit={() => setStep(7)} /><ReviewSection number={9} titleKey="kycStepOther" lines={review.other} onEdit={() => setStep(8)} />{error ? <p role="alert" className="rounded-2xl bg-red-50 p-4 font-bold text-red-800">{error}</p> : null}<Button type="button" size="large" className="w-full" disabled={generating} onClick={handleGenerate}><FileCheck2 />{generating ? t("kycCreatingPdf") : generatedSummary ? t("kycRecreatePdf") : t("kycCreatePdf")}</Button>{generatedSummary ? <Card className="p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="text-xl font-extrabold">{t("kycSummaryReady")}</h3><p className="text-muted">{t("kycSummaryReadyHelp")}</p></div><Button asChild variant="secondary"><a href={generatedSummary.url} download={generatedSummary.file.name}><Download />{t("kycDownloadPdf")}</a></Button></div><iframe title={t("kycPdfPreview")} src={`${generatedSummary.url}#toolbar=1&navpanes=0`} className="mt-5 h-[70vh] w-full rounded-2xl border bg-white" /></Card> : null}</div>;
   }
 
-  return <div className="space-y-6"><header><p className="eyebrow">{t("kycPrivateMedicalInformation")}</p><h1 className="patient-heading mt-2">{t("kycTitle")}</h1><p className="mt-3 max-w-3xl text-lg text-muted">{t("kycIntro")}</p></header><Card className="overflow-hidden"><div className="border-b bg-slate-50 p-5 dark:bg-slate-900/40"><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-extrabold uppercase tracking-wide text-primary">{t("kycStep", { current: step + 1, total: steps.length })}</p><h2 className="mt-1 text-2xl font-extrabold">{t(steps[step])}</h2></div><span className="grid h-12 w-12 place-items-center rounded-full bg-primary font-extrabold text-white">{step + 1}</span></div><div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-200" aria-label={t("kycProgress", { percent: Math.round(progress) })}><div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} /></div></div><div className="p-5 md:p-7">{renderStep()}<div className="mt-8 flex flex-wrap justify-between gap-3">{step > 0 ? <Button type="button" variant="secondary" onClick={() => setStep((current) => current - 1)}><ChevronLeft />{t("back")}</Button> : <span />}{step < steps.length - 1 ? <Button type="button" size="large" onClick={() => setStep((current) => current + 1)}>{t("kycSaveContinue")}<ChevronRight /></Button> : <span className="inline-flex items-center gap-2 font-bold text-green-700"><Check />{t("kycReviewReached")}</span>}</div></div></Card></div>;
+  return (
+    <div className="space-y-6">
+      <header>
+        <p className="eyebrow">{t("kycPrivateMedicalInformation")}</p>
+        <h1 className="patient-heading mt-2">{t("kycTitle")}</h1>
+        <p className="page-intro mt-3 max-w-3xl">{t("kycIntro")}</p>
+      </header>
+      <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50/70 p-4 text-sm leading-relaxed text-muted dark:bg-blue-950/20">
+        <UsersRound className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
+        <p>{t("kycTrustedHelp")}</p>
+      </div>
+      <Card className="overflow-hidden">
+        <div className="border-b border-blue-100 bg-blue-50/60 p-5 dark:bg-blue-950/30">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-extrabold uppercase tracking-wide text-primary">{t("kycStep", { current: step + 1, total: steps.length })}</p>
+              <h2 className="mt-1 text-2xl font-extrabold">{t(steps[step])}</h2>
+            </div>
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary font-extrabold text-white">{step + 1}</span>
+          </div>
+          <div className="mt-4 grid grid-cols-10 gap-1.5" aria-label={t("kycProgress", { percent: Math.round(progress) })}>
+            {steps.map((stepKey, index) => <span key={stepKey} className={`h-2.5 rounded-full transition-colors ${index <= step ? "bg-primary" : "bg-blue-100"}`} />)}
+          </div>
+        </div>
+        <div className="p-5 md:p-7">
+          {renderStep()}
+          <div className="sticky bottom-[calc(72px+env(safe-area-inset-bottom))] z-20 -mx-5 mt-8 flex flex-wrap justify-between gap-3 border-t border-blue-100 bg-card/95 px-5 py-4 backdrop-blur md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:pb-0">
+            {step > 0 ? <Button type="button" variant="secondary" onClick={() => setStep((current) => current - 1)}><ChevronLeft />{t("back")}</Button> : <span />}
+            {step < steps.length - 1 ? <Button type="button" size="large" onClick={() => setStep((current) => current + 1)}>{t("kycSaveContinue")}<ChevronRight /></Button> : <span className="inline-flex items-center gap-2 font-bold text-green-700"><Check />{t("kycReviewReached")}</span>}
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
 }

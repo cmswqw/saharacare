@@ -1,5 +1,7 @@
 "use server";
 
+import { safeDatabaseDiagnostic } from "@/lib/security-diagnostics";
+
 import { revalidatePath } from "next/cache";
 import {
   isAppointmentDate,
@@ -149,12 +151,7 @@ function logMutationError(event: string, error: {
   details?: string;
   hint?: string;
 }) {
-  console.error(event, {
-    code: error.code,
-    message: error.message,
-    details: error.details,
-    hint: error.hint,
-  });
+  console.error(event, safeDatabaseDiagnostic(error));
 }
 
 function revalidateAppointmentPaths() {

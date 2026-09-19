@@ -14,6 +14,32 @@ function isBoundedString(value: unknown, minimum: number, maximum: number) {
   return typeof value === "string" && value.length >= minimum && value.length <= maximum;
 }
 
+// Only browser push services may receive server-side notification requests.
+// Never turn a subscription supplied by a browser into an arbitrary HTTPS fetch.
+export function isAllowedPushEndpoint(value: unknown): value is string {
+  if (!isBoundedString(value, 20, 2048)) return false;
+
+  try {
+    const endpoint = new URL(value as string);
+    if (
+      endpoint.protocol !== "https:"
+      || endpoint.username
+      || endpoint.password
+      || endpoint.port
+      || endpoint.hash
+    ) return false;
+
+    const hostname = endpoint.hostname;
+    return hostname === "fcm.googleapis.com"
+      || hostname === "updates.push.services.mozilla.com"
+      || hostname === "web.push.apple.com"
+      || hostname === "notify.windows.com"
+      || hostname.endsWith(".notify.windows.com");
+  } catch {
+    return false;
+  }
+}
+
 export function parsePushSubscriptionInput(value: unknown): PushSubscriptionInput | null {
   if (!value || typeof value !== "object") return null;
   const candidate = value as Record<string, unknown>;
@@ -22,18 +48,12 @@ export function parsePushSubscriptionInput(value: unknown): PushSubscriptionInpu
   const keyRecord = keys as Record<string, unknown>;
 
   if (
-    !isBoundedString(candidate.endpoint, 20, 2048)
+    !isAllowedPushEndpoint(candidate.endpoint)
     || !isBoundedString(keyRecord.p256dh, 20, 512)
     || !isBoundedString(keyRecord.auth, 10, 256)
     || (candidate.language !== "en" && candidate.language !== "ne")
     || typeof candidate.soundEnabled !== "boolean"
   ) return null;
-
-  try {
-    if (new URL(candidate.endpoint as string).protocol !== "https:") return null;
-  } catch {
-    return null;
-  }
 
   return {
     endpoint: candidate.endpoint as string,
@@ -49,13 +69,7 @@ export function parsePushSubscriptionInput(value: unknown): PushSubscriptionInpu
 export function parsePushEndpoint(value: unknown) {
   if (!value || typeof value !== "object") return null;
   const endpoint = (value as Record<string, unknown>).endpoint;
-  if (!isBoundedString(endpoint, 20, 2048)) return null;
-
-  try {
-    return new URL(endpoint as string).protocol === "https:" ? endpoint as string : null;
-  } catch {
-    return null;
-  }
+  return isAllowedPushEndpoint(endpoint) ? endpoint : null;
 }
 
 export function isSameOriginMutation(request: Request) {

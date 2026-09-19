@@ -34,11 +34,11 @@ test("localized text interpolates dynamic UI values", () => {
   assert.notEqual(translate("ne", "newChat"), translate("en", "newChat"));
 });
 
-test("role choices use shared fixed dimensions and accessible focus styling", () => {
+test("role choices use consistent responsive dimensions and accessible focus styling", () => {
   const rolePage = source("app/role/page.tsx");
   const authForm = source("components/auth/AuthForm.tsx");
 
-  assert.match(rolePage, /h-\[25rem\] min-h-\[25rem\] w-full/);
+  assert.match(rolePage, /min-h-\[20rem\] w-full/);
   assert.match(rolePage, /focus-visible:ring-4/);
   assert.match(authForm, /h-20 min-h-20 w-full/);
   assert.match(authForm, /focus-visible:ring-4/);
@@ -66,8 +66,8 @@ test("quick actions stay mounted in the dashboard and contain localized labels",
 
   assert.match(dashboard, /<QuickActionsCard\s*\/>/);
   assert.doesNotMatch(sections, /xl:col-span-2/);
-  assert.match(sections, /grid-cols-1 gap-4 min-\[375px\]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3/);
-  assert.match(sections, /min-h-32 min-w-0 w-full/);
+  assert.match(sections, /grid-cols-1 gap-3 min-\[375px\]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5/);
+  assert.match(sections, /min-h-28 min-w-0 w-full/);
   assert.match(sections, /leading-tight whitespace-normal break-words \[overflow-wrap:anywhere\]/);
   assert.match(sections, /focus-visible:ring-4/);
   for (const route of [

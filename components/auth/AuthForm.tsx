@@ -212,7 +212,7 @@ export function AuthForm({
 
         <div className="mx-auto mt-10 max-w-xl">
           <div className="surface overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-7 text-center dark:from-blue-950/50 dark:to-slate-800">
+            <div className="border-b border-blue-100 bg-gradient-to-br from-blue-50 via-white to-blue-100/70 px-6 py-7 text-center dark:from-blue-950/50 dark:via-card dark:to-blue-900/40">
               <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-white text-primary shadow-soft dark:bg-slate-900">
                 <LockKeyhole className="h-8 w-8" />
               </span>
@@ -269,7 +269,7 @@ export function AuthForm({
                         onChange={(event) => setFullName(event.target.value)}
                         disabled={submitting}
                         className="min-h-14 w-full rounded-2xl border-2 bg-card py-3 pl-12 pr-4 text-base font-semibold"
-                        placeholder="Maya Sharma"
+                        placeholder={t("fullNamePlaceholder")}
                       />
                     </span>
                   </label>

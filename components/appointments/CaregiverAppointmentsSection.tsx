@@ -33,6 +33,7 @@ export function CaregiverAppointmentsSection({
         <Button
           type="button"
           size="large"
+          className="w-full sm:w-auto"
           aria-expanded={showBooking}
           onClick={() => setShowBooking((current) => !current)}
         >
@@ -48,7 +49,7 @@ export function CaregiverAppointmentsSection({
       ) : null}
 
       {appointments.length > 0 ? (
-        <div className="grid gap-5">
+        <div className="grid items-start gap-5 xl:grid-cols-2">
           {appointments.map((appointment) => (
             <AppointmentCard key={appointment.id} appointment={appointment} viewer="caregiver" />
           ))}

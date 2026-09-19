@@ -34,13 +34,17 @@ export default async function CaregiverPage() {
   ));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <CaregiverDoseRealtime patients={realtimePatients} />
-      <header>
-        <p className="eyebrow"><TranslatedText translationKey="caregiverOverview" /></p>
-        <h1 className="mt-2 text-4xl font-extrabold tracking-tight"><TranslatedText translationKey="greetingName" values={{ name: profile.full_name }} /></h1>
-        <p className="mt-3 text-lg text-muted"><TranslatedText translationKey="caregiverDashboardIntro" /></p>
-      </header>
+      <Card className="relative overflow-hidden bg-gradient-to-br from-white via-white to-blue-50 p-5 md:p-8 dark:from-card dark:via-card dark:to-blue-950/40">
+        <span className="absolute -end-10 -top-10 h-32 w-32 rounded-full bg-blue-100/60" aria-hidden="true" />
+        <header className="relative flex items-start gap-4">
+          <span className="icon-tile hidden sm:grid"><ShieldCheck aria-hidden="true" /></span>
+          <div><p className="eyebrow"><TranslatedText translationKey="caregiverOverview" /></p>
+          <h1 className="patient-heading mt-2"><TranslatedText translationKey="greetingName" values={{ name: profile.full_name }} /></h1>
+          <p className="page-intro mt-2"><TranslatedText translationKey="caregiverDashboardIntro" /></p></div>
+        </header>
+      </Card>
 
       <CaregiverConnectCard links={result.data} />
 
@@ -66,7 +70,7 @@ export default async function CaregiverPage() {
             </p>
           </Card>
         ) : (
-          <div className="grid gap-5">
+          <div className="grid gap-5 2xl:grid-cols-2">
             {acceptedPatients.map((patient) => (
               <PatientCard key={patient.link_id} patient={patient} />
             ))}

@@ -31,8 +31,8 @@ export function MedicineCard({
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-extrabold">{medication.name}</h2>
+            <div className="min-w-0">
+              <h2 className="break-words text-2xl font-extrabold leading-tight">{medication.name}</h2>
               <p className="mt-1 text-lg font-bold text-primary">{medication.dosage}</p>
             </div>
             <span className={`rounded-full px-3 py-1 text-sm font-extrabold ${
@@ -52,7 +52,7 @@ export function MedicineCard({
       <div className="border-t p-5 md:p-6">
         <div className="grid gap-3 sm:grid-cols-2">
           {medication.schedules.map((schedule) => (
-            <div key={schedule.id} className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
+            <div key={schedule.id} className="rounded-2xl border border-blue-100 bg-blue-50/45 p-4 dark:bg-blue-950/20">
               <p className="flex items-center gap-2 text-lg font-extrabold">
                 <Clock3 className="text-primary" />
                 {formatMedicationTime(schedule.scheduled_time, language)}

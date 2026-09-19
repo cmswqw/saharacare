@@ -27,6 +27,14 @@ export const doctorNavigation = [
   { href: "/settings", label: "settings" as const, icon: Settings },
 ];
 
+export const patientMobileNavigation = [
+  patientNavigation[0],
+  patientNavigation[1],
+  patientNavigation[3],
+  patientNavigation[2],
+  patientNavigation[5],
+];
+
 export const adminNavigation = [
   { href: "/admin", label: "adminOverview" as const, icon: LayoutDashboard },
   { href: "/settings", label: "settings" as const, icon: Settings },

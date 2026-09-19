@@ -11,7 +11,7 @@ import { AvailableSlotPicker } from "@/components/appointments/AvailableSlotPick
 import { useApp } from "@/components/providers/AppProvider";
 import { Button } from "@/components/ui/Button";
 
-const fieldClass = "min-h-14 w-full rounded-2xl border-2 bg-card px-4 text-base font-semibold focus:border-primary";
+const fieldClass = "min-h-14 w-full rounded-2xl border-2 border-border bg-card px-4 text-base font-semibold transition-colors focus:border-primary";
 const initialState: AppointmentActionState = { status: "idle", message: "" };
 
 export function AppointmentRequestForm({
@@ -128,20 +128,22 @@ export function AppointmentRequestForm({
         />
       </div>
 
-      {state.status === "error" ? (
-        <p role="alert" className="rounded-2xl bg-red-50 p-4 font-bold text-red-800">
-          {language === "ne" ? t("appointmentRequestError") : state.message}
-        </p>
-      ) : null}
-      <Button
-        type="submit"
-        size="large"
-        className="w-full"
-        disabled={pending || doctors.length === 0 || !selectedSlot}
-      >
-        <CalendarCheck2 aria-hidden="true" />
-        {t(pending ? "bookingAppointment" : "confirmAppointment")}
-      </Button>
+      <div className="sticky bottom-[calc(72px+env(safe-area-inset-bottom))] z-20 -mx-5 space-y-3 border-t border-blue-100 bg-card/95 px-5 py-4 backdrop-blur md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:py-0">
+        {state.status === "error" ? (
+          <p role="alert" className="rounded-2xl bg-red-50 p-4 font-bold text-red-800">
+            {language === "ne" ? t("appointmentRequestError") : state.message}
+          </p>
+        ) : null}
+        <Button
+          type="submit"
+          size="large"
+          className="w-full"
+          disabled={pending || doctors.length === 0 || !selectedSlot}
+        >
+          <CalendarCheck2 aria-hidden="true" />
+          {t(pending ? "bookingAppointment" : "confirmAppointment")}
+        </Button>
+      </div>
     </form>
   );
 }

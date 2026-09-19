@@ -245,3 +245,24 @@ export function normalizeAIProviderError(
     providerResponseId,
   };
 }
+
+// Provider text can echo prompts, medical context or credentials. Log only
+// known classifications/statuses, never messages or arbitrary provider fields.
+export function safeAIProviderDiagnostic(error: unknown, stage: "request" | "stream") {
+  const normalized = normalizeAIProviderError(error, stage);
+  const allowedNames = new Set(["Error", "TypeError", "AbortError", "ApiError", "AIProviderError"]);
+  const allowedCodes = new Set([
+    "INVALID_ARGUMENT", "UNAUTHENTICATED", "PERMISSION_DENIED", "NOT_FOUND",
+    "RESOURCE_EXHAUSTED", "INTERNAL", "UNAVAILABLE", "DEADLINE_EXCEEDED",
+    "SAFETY", "RECITATION", "BLOCKLIST", "PROHIBITED_CONTENT", "SPII", "OTHER",
+  ]);
+  const status = normalized.httpStatus;
+  return {
+    errorName: error instanceof Error && allowedNames.has(error.name) ? error.name : "Error",
+    httpStatus: status !== null && Number.isInteger(status) && status >= 100 && status <= 599 ? status : null,
+    normalizedCode: normalized.normalizedCode,
+    providerErrorCode: normalized.providerCode && allowedCodes.has(normalized.providerCode)
+      ? normalized.providerCode
+      : null,
+  };
+}

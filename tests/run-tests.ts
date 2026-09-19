@@ -9,3 +9,5 @@ import "./medical-files.test";
 import "./medical-kyc.test";
 import "./push-notifications.test";
 import "./ui-localization.test";
+import "./security-hardening.test";
+import "./database-security.test";

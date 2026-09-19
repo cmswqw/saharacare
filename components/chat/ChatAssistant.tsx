@@ -185,7 +185,7 @@ export function ChatAssistant({
         <div>
           <p className="eyebrow">{t("chatReadOnlySupport")}</p>
           <h1 className="patient-heading mt-2">{t("chatTitle")}</h1>
-          <p className="mt-3 max-w-3xl text-lg leading-relaxed text-muted">
+          <p className="page-intro mt-3 max-w-3xl">
             {t("chatIntro")}
           </p>
         </div>
@@ -254,7 +254,7 @@ export function ChatAssistant({
               <div className={`max-w-[82%] rounded-3xl px-5 py-4 ${
                 message.role === "user"
                   ? "bg-primary text-white"
-                  : "border bg-slate-50 dark:bg-slate-900"
+                  : "border border-blue-100 bg-blue-50/45 dark:bg-blue-950/20"
               }`}>
                 <p className="mb-1 text-xs font-bold uppercase tracking-wide opacity-70">
                   {message.role === "user" ? t("you") : t("chatTitle")}
@@ -273,7 +273,7 @@ export function ChatAssistant({
           <div ref={endRef} />
         </div>
 
-        <div className="border-t p-4 md:p-6">
+        <div className="sticky bottom-[calc(72px+env(safe-area-inset-bottom))] border-t border-blue-100 bg-card/95 p-4 backdrop-blur md:static md:p-6">
           {messages.length === 1 ? (
             <div className="mb-4 flex flex-wrap gap-2" aria-label={t("suggestedQuestions")}>
               {starterQuestionKeys.map((questionKey) => (

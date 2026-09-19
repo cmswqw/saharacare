@@ -12,7 +12,7 @@ export function PatientSidebar() {
   const { t } = useApp();
 
   return (
-    <aside className="fixed inset-y-0 start-0 z-40 hidden w-72 border-e bg-card p-5 lg:flex lg:flex-col">
+    <aside className="fixed inset-y-0 start-0 z-40 hidden w-72 border-e border-blue-100 bg-card p-5 lg:flex lg:flex-col">
       <Link href="/patient" className="mb-10 flex items-center gap-3 rounded-2xl px-2 py-1">
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-white">
           <HeartPulse />
@@ -29,10 +29,10 @@ export function PatientSidebar() {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex min-h-14 items-center gap-4 rounded-2xl px-4 text-base font-bold transition-colors",
+                  "flex min-h-14 items-center gap-4 rounded-2xl px-4 text-base font-bold transition-[background-color,color,transform] active:scale-[0.99] motion-reduce:transform-none",
                   active
-                    ? "bg-blue-50 text-primary dark:bg-blue-950/50"
-                    : "text-muted hover:bg-slate-100 dark:hover:bg-slate-800",
+                    ? "bg-blue-50 text-primary shadow-[inset_3px_0_0_#17615A] dark:bg-blue-950/50"
+                    : "text-muted hover:bg-blue-50/70 hover:text-foreground dark:hover:bg-blue-950/30",
                 )}
                 aria-current={active ? "page" : undefined}
               >
@@ -46,7 +46,7 @@ export function PatientSidebar() {
       <div className="mt-auto">
         <Link
           href="/settings"
-          className="flex min-h-16 items-center gap-4 rounded-2xl px-4 text-lg font-bold text-muted hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="flex min-h-16 items-center gap-4 rounded-2xl px-4 text-lg font-bold text-muted hover:bg-blue-50 hover:text-foreground dark:hover:bg-blue-950/30"
         >
           <Settings aria-hidden="true" />
           {t("settings")}

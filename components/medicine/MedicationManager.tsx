@@ -25,14 +25,14 @@ export function MedicationManager({ medications }: { medications: Medication[] }
         <div>
           <p className="eyebrow">{t("medicationPlan")}</p>
           <h1 className="patient-heading mt-2">{t("myMedicines")}</h1>
-          <p className="mt-3 text-lg text-muted">
+          <p className="page-intro mt-3">
             {t("medicationPlanHelp")}
           </p>
         </div>
-        <Button size="large" onClick={() => openForm(null)}><Plus />{t("addMedication")}</Button>
+        <Button size="large" className="w-full sm:w-auto" onClick={() => openForm(null)}><Plus />{t("addMedication")}</Button>
       </div>
 
-      <div className="mt-8 grid gap-6">
+      <div className="mt-8 grid items-start gap-5 2xl:grid-cols-2">
         {medications.length === 0 ? (
           <MedicationEmptyState>
             <Button onClick={() => openForm(null)}><Plus />{t("addFirstMedication")}</Button>

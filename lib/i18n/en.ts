@@ -1,5 +1,8 @@
 export const en = {
   appName: "SaharaCare",
+  skipToContent: "Skip to content",
+  fullNamePlaceholder: "Your full name",
+  kycTrustedHelp: "Need help? You can complete this with someone you trust. Review every answer before sharing.",
   tagline: "Medicine support for your family",
   taglineDetail: "A calm, simple companion for daily medicines and family care.",
   getStarted: "Get started",

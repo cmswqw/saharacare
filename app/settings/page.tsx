@@ -25,7 +25,7 @@ function SettingRow({
 }) {
   return (
     <div className="flex items-center gap-4 py-4">
-      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-50 text-primary dark:bg-blue-950"><Icon /></span>
+      <span className="icon-tile" aria-hidden="true"><Icon /></span>
       <div className="min-w-0 flex-1">
         <p className="text-lg font-extrabold">{title}</p>
         <p className="mt-1 text-sm text-muted">{detail}</p>
@@ -52,7 +52,7 @@ export default function SettingsPage() {
         <header className="mt-10">
           <p className="eyebrow">{app.t("comfortReminders")}</p>
           <h1 className="patient-heading mt-2">{app.t("settings")}</h1>
-          <p className="mt-3 text-lg text-muted">{app.t("settingsIntro")}</p>
+          <p className="page-intro mt-3">{app.t("settingsIntro")}</p>
         </header>
 
         <div className="mt-8 space-y-6">

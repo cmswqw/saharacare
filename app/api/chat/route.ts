@@ -8,7 +8,7 @@ import {
   getAuthenticatedChatActor,
 } from "@/lib/chat/context";
 import {
-  normalizeAIProviderError,
+  safeAIProviderDiagnostic,
 } from "@/lib/chat/gemini-adapter";
 import {
   getChatProvider,
@@ -18,6 +18,7 @@ import { SAHARACARE_CHAT_INSTRUCTIONS } from "@/lib/chat/instructions";
 import { checkChatRateLimit } from "@/lib/chat/rate-limit";
 import { getDeterministicSafetyReply } from "@/lib/chat/safety";
 import { createClient } from "@/lib/supabase/server";
+import { readBoundedJson, RequestBodyError } from "@/lib/request-body";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -58,52 +59,16 @@ function logChatEvent(
   });
 }
 
-type ProviderFailureDiagnostic = {
-  errorClass: string;
-  errorName: string | null;
-  httpStatus: number | null;
-  model: string;
-  normalizedCode: string;
-  provider: string;
-  providerErrorCode: string | null;
-  providerErrorMessage: string | null;
-  providerRequestId: string | null;
-  providerResponseId: string | null;
-};
-
-function sanitizeProviderLogValue(value: unknown) {
-  if (typeof value !== "string" || value.length === 0) return null;
-
-  let sanitized = value
-    .replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]")
-    .replace(/(?:sk|sb_secret)_[A-Za-z0-9_-]+/g, "[REDACTED_SECRET]")
-    .replace(/AIza[A-Za-z0-9_-]{20,}/g, "[REDACTED_SECRET]")
-    .replace(/[\u0000-\u001F\u007F]/g, " ");
-  const configuredKey = process.env.GEMINI_API_KEY?.trim();
-
-  if (configuredKey) sanitized = sanitized.replaceAll(configuredKey, "[REDACTED_SECRET]");
-  return sanitized.slice(0, 800);
-}
-
 function getProviderFailureDiagnostic(
   error: unknown,
   stage: "request" | "stream",
   provider: string,
   model: string,
-): ProviderFailureDiagnostic {
-  const normalized = normalizeAIProviderError(error, stage);
-
+) {
   return {
-    errorClass: error instanceof Error ? error.constructor.name : typeof error,
-    errorName: error instanceof Error ? error.name : null,
-    httpStatus: normalized.httpStatus,
+    ...safeAIProviderDiagnostic(error, stage),
     model,
-    normalizedCode: normalized.normalizedCode,
     provider,
-    providerErrorCode: sanitizeProviderLogValue(normalized.providerCode),
-    providerErrorMessage: sanitizeProviderLogValue(normalized.providerMessage),
-    providerRequestId: sanitizeProviderLogValue(normalized.providerRequestId),
-    providerResponseId: sanitizeProviderLogValue(normalized.providerResponseId),
   };
 }
 
@@ -111,7 +76,7 @@ function logProviderFailure(
   requestId: string,
   event: string,
   startedAt: number,
-  diagnostic: ProviderFailureDiagnostic,
+  diagnostic: ReturnType<typeof getProviderFailureDiagnostic>,
 ) {
   console.error("[saharacare-chat]", {
     requestId,
@@ -124,16 +89,13 @@ function logProviderFailure(
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   const startedAt = Date.now();
-  const declaredLength = Number(request.headers.get("content-length") ?? "0");
-
-  if (Number.isFinite(declaredLength) && declaredLength > MAX_CHAT_REQUEST_BYTES) {
-    return textResponse("The chat request is too large.", 413, requestId);
-  }
-
   let rawPayload: unknown;
   try {
-    rawPayload = await request.json();
-  } catch {
+    rawPayload = await readBoundedJson(request, MAX_CHAT_REQUEST_BYTES);
+  } catch (error) {
+    if (error instanceof RequestBodyError && error.status === 413) {
+      return textResponse("The chat request is too large.", 413, requestId);
+    }
     return textResponse("The chat request is invalid.", 400, requestId);
   }
 
@@ -257,7 +219,7 @@ export async function POST(request: Request) {
       requestId,
       "request_failed",
       startedAt,
-      error instanceof Error ? error.name : "unknown_request_error",
+      "unknown_request_error",
     );
     return textResponse(
       "The assistant is temporarily unavailable. Please try again.",

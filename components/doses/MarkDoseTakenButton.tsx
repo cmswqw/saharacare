@@ -31,8 +31,8 @@ export function MarkDoseTakenButton({
 
   if (isTaken && effectiveTakenAt) {
     return (
-      <p className="flex min-h-12 items-center gap-2 rounded-2xl bg-green-50 px-4 font-extrabold text-green-800 dark:bg-green-950/30 dark:text-green-200">
-        <Check />{t("takenAt", { time: formatDoseTimestamp(effectiveTakenAt, language) })}
+      <p className="success-pop flex min-h-12 items-center gap-2 rounded-2xl bg-green-50 px-4 font-extrabold text-green-800 dark:bg-green-950/30 dark:text-green-200">
+        <Check aria-hidden="true" />{t("takenAt", { time: formatDoseTimestamp(effectiveTakenAt, language) })}
       </p>
     );
   }

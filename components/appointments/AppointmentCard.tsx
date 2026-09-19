@@ -28,20 +28,20 @@ export function AppointmentCard({
   const canManage = (viewer === "patient" || viewer === "caregiver")
     && (appointment.status === "requested" || appointment.status === "confirmed");
 
-  return <Card className="p-5 md:p-6">
+  return <Card className="min-w-0 p-5 md:p-6">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="flex gap-4">
         <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-blue-50 text-primary dark:bg-blue-950/50">
           {viewer === "doctor" ? <UserRound aria-hidden="true" /> : <Stethoscope aria-hidden="true" />}
         </span>
-        <div>
-          <h3 className="text-xl font-extrabold">{viewer === "doctor" ? appointment.patient_name : appointment.doctor_name}</h3>
+        <div className="min-w-0">
+          <h3 className="break-words text-xl font-extrabold">{viewer === "doctor" ? appointment.patient_name : appointment.doctor_name}</h3>
           <p className="mt-1 text-base text-muted">{appointment.facility}</p>
         </div>
       </div>
       <StatusPill status={pillStatus} label={label} />
     </div>
-    <div className="mt-5 grid gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800 sm:grid-cols-2">
+    <div className="mt-5 grid gap-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 dark:bg-blue-950/20 sm:grid-cols-2">
       <p className="flex items-center gap-2 font-bold"><CalendarDays className="text-primary" aria-hidden="true" />{formatAppointmentDate(appointment.starts_at, language)}</p>
       <p className="flex items-center gap-2 font-bold"><Clock3 className="text-primary" aria-hidden="true" />{formatAppointmentTime(appointment.starts_at, language)}</p>
       <p className="text-muted sm:col-span-2">{purposeKey ? t(purposeKey) : appointment.purpose}</p>

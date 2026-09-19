@@ -3,20 +3,20 @@
 @tailwind utilities;
 
 :root {
-  --background: 248 250 252;
-  --foreground: 17 24 39;
+  --background: 246 251 250;
+  --foreground: 8 52 48;
   --card: 255 255 255;
-  --muted: 75 85 99;
-  --border: 226 232 240;
+  --muted: 75 102 99;
+  --border: 207 229 225;
   --patient-text: 18px;
 }
 
 .dark {
-  --background: 11 18 32;
-  --foreground: 241 245 249;
-  --card: 23 33 51;
-  --muted: 174 185 201;
-  --border: 55 65 81;
+  --background: 5 30 28;
+  --foreground: 239 248 246;
+  --card: 11 48 45;
+  --muted: 180 205 201;
+  --border: 40 87 81;
 }
 
 .contrast {
@@ -34,13 +34,20 @@ body {
   min-height: 100vh;
   background: rgb(var(--background));
   color: rgb(var(--foreground));
-  font-family: var(--font-sans), var(--font-devanagari), system-ui, sans-serif;
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(47, 160, 149, 0.08), transparent 26rem),
+    linear-gradient(180deg, rgb(var(--background)), rgb(var(--background)));
+  font-family: Arial, var(--font-devanagari), system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
 }
 
 button, a, input, select, textarea { outline: none; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 0 0 4px rgba(47, 160, 149, 0.3);
 }
+
+input, select, textarea { color: rgb(var(--foreground)); }
+input::placeholder, textarea::placeholder { color: rgb(var(--muted) / 0.72); }
 
 .patient-ui { font-size: var(--patient-text); }
 .text-size-normal { --patient-text: 18px; }
@@ -52,11 +59,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 
+@keyframes success-pop {
+  0% { opacity: 0; transform: scale(0.98); }
+  70% { transform: scale(1.015); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.success-pop { animation: success-pop 220ms ease-out both; }
+
 @layer components {
-  .surface { @apply rounded-3xl border bg-card shadow-soft; }
-  .patient-heading { @apply text-3xl font-bold tracking-tight md:text-4xl; }
-  .section-title { @apply text-2xl font-bold tracking-tight; }
-  .eyebrow { @apply text-base font-bold uppercase tracking-[0.12em] text-primary; }
+  .surface { @apply rounded-3xl border border-blue-100 bg-card shadow-soft; }
+  .patient-heading { @apply text-[2rem] font-extrabold leading-tight tracking-[-0.025em] md:text-4xl; }
+  .section-title { @apply text-2xl font-extrabold leading-tight tracking-[-0.02em]; }
+  .eyebrow { @apply text-sm font-extrabold uppercase tracking-[0.14em] text-primary; }
+  .icon-tile { @apply grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-50 text-primary; }
+  .page-intro { @apply text-base leading-relaxed text-muted md:text-lg; }
+  .field-control { @apply min-h-12 w-full rounded-2xl border-2 border-border bg-card px-4 transition-colors focus:border-primary; }
   .touch-target { @apply min-h-16; }
   .safe-bottom { padding-bottom: max(6.5rem, env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 360px) {
+  .patient-ui { font-size: min(var(--patient-text), 20px); }
 }

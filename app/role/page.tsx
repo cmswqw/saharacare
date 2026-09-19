@@ -26,7 +26,7 @@ const choices = [
     key: "doctorRole" as const,
     detail: "doctorRoleDetail" as const,
     Icon: Stethoscope,
-    color: "bg-violet-50 text-violet-700 dark:bg-violet-950/40",
+    color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-100",
   },
 ];
 
@@ -55,7 +55,7 @@ export default function RolePage() {
           <p className="mt-4 text-lg text-muted">{t("chooseRoleHelp")}</p>
         </div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
           {choices.map(({ href, key, detail, Icon, color }, index) => (
             <motion.div
               key={href}
@@ -67,13 +67,13 @@ export default function RolePage() {
             >
               <Link
                 href={href}
-                className="surface grid h-[25rem] min-h-[25rem] w-full grid-rows-[96px_minmax(72px,auto)_1fr_auto] items-center justify-items-center p-8 text-center transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+                className="surface grid min-h-[20rem] w-full grid-rows-[80px_minmax(64px,auto)_1fr_auto] items-center justify-items-center p-6 text-center transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 lg:p-8"
               >
-                <span className={`grid h-24 w-24 place-items-center rounded-3xl ${color}`}>
-                  <Icon className="h-14 w-14" />
+                <span className={`grid h-20 w-20 place-items-center rounded-3xl ${color}`}>
+                  <Icon className="h-11 w-11" />
                 </span>
-                <h2 className="mt-6 self-start text-3xl font-extrabold">{t(key)}</h2>
-                <p className="mt-3 max-w-sm self-start text-lg leading-relaxed text-muted">{t(detail)}</p>
+                <h2 className="mt-5 self-start text-2xl font-extrabold lg:text-3xl">{t(key)}</h2>
+                <p className="mt-3 max-w-sm self-start text-base leading-relaxed text-muted lg:text-lg">{t(detail)}</p>
                 <span className="mt-6 font-bold text-primary">{t("continue")} →</span>
               </Link>
             </motion.div>

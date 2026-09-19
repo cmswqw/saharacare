@@ -1,5 +1,7 @@
 "use server";
 
+import { safeDatabaseDiagnostic } from "@/lib/security-diagnostics";
+
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { Phase4ActionState, UserRole } from "@/types";
@@ -197,19 +199,12 @@ export async function saveMedicationAction(
   });
 
   if (error) {
-    console.error("save_patient_medication RPC failed", {
-      code: error.code,
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-    });
+    console.error("save_patient_medication RPC failed", safeDatabaseDiagnostic(error));
     return actionResult("error", medicationMutationErrorMessage(error));
   }
 
   if (typeof savedMedicationId !== "string" || !uuidPattern.test(savedMedicationId)) {
-    console.error("save_patient_medication RPC returned an invalid medication id", {
-      savedMedicationId,
-    });
+    console.error("save_patient_medication RPC returned an invalid medication id");
     return actionResult("error", "Supabase did not confirm the medication save.");
   }
 

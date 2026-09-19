@@ -26,7 +26,7 @@ export function TodayProgressCard({ doses }: { doses: TodayDose[] }) {
   const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   return (
-    <Card className="p-5 md:p-6">
+    <Card className="h-full p-5 md:p-6">
       <div className="flex items-center justify-between gap-3">
         <div><p className="eyebrow">{t("today")}</p><h2 className="mt-1 text-2xl font-extrabold">{t("todaysProgress")}</h2></div>
         <strong className="text-2xl text-primary">{progress}%</strong>
@@ -51,7 +51,7 @@ export function UpcomingRemindersCard({ doses }: { doses: TodayDose[] }) {
     .slice(0, 3);
 
   return (
-    <Card className="p-5 md:p-6">
+    <Card className="h-full p-5 md:p-6">
       <div className="flex items-center justify-between gap-3">
         <div><p className="eyebrow">{t("medicineReminders")}</p><h2 className="mt-1 text-2xl font-extrabold">{t("upcomingToday")}</h2></div>
         <Link href="#today-schedule" className="font-bold text-primary hover:underline">{t("viewSchedule")}</Link>
@@ -62,7 +62,7 @@ export function UpcomingRemindersCard({ doses }: { doses: TodayDose[] }) {
         <div className="mt-4 divide-y">
           {upcoming.map((dose) => (
             <div key={dose.id} className="flex items-center gap-3 py-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-blue-50 text-primary dark:bg-blue-950"><Clock3 /></span>
+              <span className="icon-tile h-11 w-11"><Clock3 aria-hidden="true" /></span>
               <div className="min-w-0 flex-1"><p className="truncate font-extrabold">{dose.medication.name}</p><p className="mt-1 text-sm font-semibold text-muted">{dose.medication.dosage}</p></div>
               <time className="font-extrabold text-primary" dateTime={dose.scheduled_at}>{formatDoseTimestamp(dose.scheduled_at, language)}</time>
             </div>
@@ -80,9 +80,9 @@ export function CaregiverStatusCard({ links }: { links: LinkedCaregiver[] }) {
   const firstName = accepted[0]?.caregiver?.full_name;
 
   return (
-    <Card className="p-5 md:p-6">
+    <Card className="h-full p-5 md:p-6">
       <div className="flex items-start gap-4">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-green-50 text-success dark:bg-green-950/30"><ShieldCheck /></span>
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-green-50 text-success dark:bg-green-950/30"><ShieldCheck aria-hidden="true" /></span>
         <div className="min-w-0 flex-1"><p className="eyebrow">{t("caregiverAccess")}</p><h2 className="mt-1 text-2xl font-extrabold">{accepted.length > 0 ? t("caregiverConnected") : t("caregiverNotConnected")}</h2></div>
       </div>
       <p className="mt-4 leading-relaxed text-muted">
@@ -109,17 +109,19 @@ export function QuickActionsCard() {
 
   return (
     <Card className="min-w-0 p-5 md:p-6">
-      <p className="eyebrow">{t("shortcuts")}</p>
-      <h2 className="mt-1 text-2xl font-extrabold">{t("quickActions")}</h2>
-      <div className="mt-5 grid grid-cols-1 gap-4 min-[375px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3">
+      <div>
+        <p className="eyebrow">{t("shortcuts")}</p>
+        <h2 className="mt-1 text-2xl font-extrabold">{t("quickActions")}</h2>
+      </div>
+      <div className="mt-5 grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {actions.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
-            className="flex min-h-32 min-w-0 w-full flex-col items-center justify-center gap-3 rounded-2xl border bg-slate-50 px-2 py-4 text-center text-lg font-extrabold leading-tight whitespace-normal break-words [overflow-wrap:anywhere] transition-colors hover:border-primary/40 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 sm:px-3 dark:bg-slate-900 dark:hover:bg-blue-950/40"
+            className="flex min-h-28 min-w-0 w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/45 px-3 py-4 text-center text-base font-extrabold leading-tight whitespace-normal break-words [overflow-wrap:anywhere] transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-blue-50 hover:shadow-soft focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 active:translate-y-0 motion-reduce:transform-none sm:min-h-32 sm:px-4 sm:text-lg dark:bg-blue-950/20 dark:hover:bg-blue-950/40"
             aria-label={t(label)}
           >
-            <Icon className="h-7 w-7 shrink-0 text-primary" aria-hidden="true" />
+            <span className="icon-tile bg-card shadow-sm"><Icon className="h-6 w-6 shrink-0" aria-hidden="true" /></span>
             <span className="max-w-full">{t(label)}</span>
           </Link>
         ))}

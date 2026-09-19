@@ -11,13 +11,13 @@ export default function LandingPage() {
   const { t } = useApp();
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#F8FAFC] text-[#111827] dark:bg-slate-950 dark:text-slate-50">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 md:px-10">
+    <main className="min-h-screen overflow-hidden bg-background text-foreground">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between border-b border-blue-100/80 px-5 py-4 md:px-10">
         <div className="flex items-center gap-3">
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-white">
             <HeartPulse />
           </span>
-          <span className="hidden text-2xl font-extrabold sm:inline">SaharaCare</span>
+          <span className="hidden text-2xl font-extrabold tracking-tight sm:inline">SaharaCare</span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login" className="hidden min-h-12 items-center rounded-2xl px-4 font-extrabold text-primary hover:bg-blue-50 sm:flex">
@@ -27,7 +27,7 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      <section className="mx-auto grid min-h-[calc(100vh-100px)] max-w-7xl items-center gap-12 px-5 pb-16 pt-8 md:px-10 lg:grid-cols-[1.02fr_0.98fr]">
+      <section className="mx-auto grid min-h-[calc(100vh-84px)] max-w-7xl items-center gap-12 px-5 pb-16 pt-8 md:px-10 lg:grid-cols-[1.02fr_0.98fr]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -37,10 +37,10 @@ export default function LandingPage() {
             <ShieldCheck className="h-5 w-5" />
             {t("simpleCareSupport")}
           </div>
-          <h1 className="max-w-2xl text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-[-0.04em] min-[430px]:text-[2.75rem] sm:text-6xl lg:text-7xl">
             {t("tagline")}
           </h1>
-          <p className="mt-6 max-w-xl text-xl leading-relaxed text-[#4B5563] dark:text-slate-300">
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted sm:text-xl">
             {t("taglineDetail")}
           </p>
           <p className="mt-3 text-xl font-bold text-primary">
@@ -70,8 +70,8 @@ export default function LandingPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="relative mx-auto w-full max-w-xl"
         >
-          <div className="absolute -inset-10 rounded-full bg-blue-200/40 blur-3xl dark:bg-blue-900/20" />
-          <div className="relative rounded-[2.5rem] border border-white bg-white p-5 shadow-[0_30px_80px_rgba(37,99,235,0.18)] dark:border-slate-700 dark:bg-slate-900 md:p-8">
+          <div className="absolute -inset-10 rounded-full bg-blue-200/45 blur-3xl dark:bg-blue-900/20" />
+          <div className="relative rounded-[1.75rem] border border-blue-100 bg-white p-5 shadow-[0_30px_80px_rgba(8,52,48,0.15)] dark:bg-card md:p-8">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-bold uppercase tracking-widest text-primary">{t("patientPreview")}</p>
