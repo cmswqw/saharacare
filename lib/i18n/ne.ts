@@ -1,5 +1,10 @@
 export const ne = {
   appName: "सहाराकेयर",
+  hospitalPromotionLabel: "अस्पतालको प्रचार",
+  hospitalPromotionVisit: "{name} हेर्नुहोस् (नयाँ ट्याब खुल्छ)",
+  hospitalPromotionPrevious: "अघिल्लो तस्बिर",
+  hospitalPromotionNext: "अर्को तस्बिर",
+  hospitalPromotionImage: "{total} मध्ये तस्बिर {current}",
   bookingStepCount: "४ मध्ये चरण {step}",
   bookingChooseCare: "हेरचाह छान्नुहोस्",
   bookingChooseDoctor: "डाक्टर छान्नुहोस्",

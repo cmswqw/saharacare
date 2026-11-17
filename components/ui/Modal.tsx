@@ -6,12 +6,12 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useApp } from "@/components/providers/AppProvider";
 
-export function Modal({ open, onOpenChange, title, description, children, className }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; description?: string; children: React.ReactNode; className?: string }) {
+export function Modal({ open, onOpenChange, title, description, children, className, reduceMotion = false, onPresented, onRestoreFocus }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; description?: string; children: React.ReactNode; className?: string; reduceMotion?: boolean; onPresented?: () => void; onRestoreFocus?: () => void }) {
   const { t } = useApp();
   return <Dialog.Root open={open} onOpenChange={onOpenChange}><AnimatePresence>{open ? <Dialog.Portal forceMount>
-    <Dialog.Overlay asChild><motion.div className="fixed inset-0 z-50 bg-blue-950/60 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} /></Dialog.Overlay>
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex h-dvh items-center justify-center p-2 sm:p-4">
-    <Dialog.Content asChild><motion.div initial={{ opacity: 0, scale: 0.96, y: 18 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 12 }} className={cn("pointer-events-auto grid max-h-[calc(100dvh-1rem)] min-w-0 w-full max-w-xl grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-3xl border bg-card shadow-2xl sm:max-h-[calc(100dvh-2rem)]", className)}>
+    <Dialog.Overlay asChild><motion.div className="fixed inset-0 z-50 bg-blue-950/60 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: reduceMotion ? 0.08 : 0.24 } }} exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.16 } }} /></Dialog.Overlay>
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex h-dvh items-center justify-center p-2 sm:p-4" style={onPresented ? { paddingTop: "max(0.5rem, env(safe-area-inset-top))", paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" } : undefined}>
+    <Dialog.Content onOpenAutoFocus={onPresented} onCloseAutoFocus={onRestoreFocus ? event => { event.preventDefault(); onRestoreFocus(); } : undefined} asChild><motion.div initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96, y: reduceMotion ? 0 : 18 }} animate={{ opacity: 1, scale: 1, y: 0, transition: { duration: reduceMotion ? 0.08 : 0.24, ease: "easeOut" } }} exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.97, y: reduceMotion ? 0 : 12, transition: { duration: reduceMotion ? 0 : 0.16 } }} style={onPresented ? { maxHeight: "calc(100dvh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom)))" } : undefined} className={cn("pointer-events-auto grid max-h-[calc(100dvh-1rem)] min-w-0 w-full max-w-xl grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-3xl border bg-card shadow-2xl sm:max-h-[calc(100dvh-2rem)]", className)}>
       <div className="relative border-b border-blue-100 bg-blue-50/45 px-5 py-5 pe-16 sm:px-6 sm:py-6 sm:pe-20 md:px-8 md:pe-20 dark:bg-blue-950/20">
         <Dialog.Title className="text-2xl font-bold">{title}</Dialog.Title>
         {description ? <Dialog.Description className="mt-2 text-base leading-relaxed text-muted">{description}</Dialog.Description> : null}

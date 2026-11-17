@@ -1,6 +1,7 @@
 import "./adherence.test";
 import "./admin-security.test";
 import "./appointments.test";
+import "./promotions.test";
 import "./appointment-reads.test";
 import "./booking-guidance.test";
 import "./chat-contracts.test";

@@ -1,5 +1,10 @@
 export const en = {
   appName: "SaharaCare",
+  hospitalPromotionLabel: "Hospital promotion",
+  hospitalPromotionVisit: "Visit {name} (opens a new tab)",
+  hospitalPromotionPrevious: "Previous image",
+  hospitalPromotionNext: "Next image",
+  hospitalPromotionImage: "Image {current} of {total}",
   bookingStepCount: "Step {step} of 4",
   bookingChooseCare: "Choose care",
   bookingChooseDoctor: "Choose a doctor",

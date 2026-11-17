@@ -38,10 +38,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [toastState, setToastState] = useState<ToastState>(null);
 
   useEffect(() => {
+    try {
     const savedLanguage = localStorage.getItem("saharacare-language") as Language | null;
     const savedSize = localStorage.getItem("saharacare-text-size") as TextSize | null;
     if (savedLanguage === "en" || savedLanguage === "ne") setLanguageState(savedLanguage);
     if (["normal", "large", "extra"].includes(savedSize ?? "")) setTextSizeState(savedSize as TextSize);
+    } catch { /* Browser storage is optional; keep accessible defaults. */ }
   }, []);
 
   useEffect(() => {
@@ -56,12 +58,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguage = useCallback((value: Language) => {
     setLanguageState(value);
-    localStorage.setItem("saharacare-language", value);
+    try { localStorage.setItem("saharacare-language", value); } catch { /* optional persistence */ }
   }, []);
 
   const setTextSize = useCallback((value: TextSize) => {
     setTextSizeState(value);
-    localStorage.setItem("saharacare-text-size", value);
+    try { localStorage.setItem("saharacare-text-size", value); } catch { /* optional persistence */ }
   }, []);
 
   const toast = useCallback((message: string, tone: "success" | "info" | "warning" = "info") => {

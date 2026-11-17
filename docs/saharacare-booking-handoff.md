@@ -1,5 +1,7 @@
 # SaharaCare partner directory and booking handoff
 
+Promotion milestone (2026-11-17): see [hospital-promotions.md](hospital-promotions.md) for approved-content configuration, launch/rotation policy and checks. Root `HospitalPromotionHost` reuses the shared Radix/Framer Modal; `lib/promotions/{config,policy,launch}.ts` separate configuration/validation/rotation/session control. Production content is empty; fictional development samples are opt-in and production-gated. No database or hosted changes. Feature branch `feature/hospital-promotional-popups` targets the verified Codefest integration branch `codex/saharacare-latest`, not unrelated `main`; no merge/deploy. Browser tests use real UI/policy with synthetic content; physical devices and approved live content require manual acceptance. Existing booking/auth work remains intact.
+
 Latest: **Appointment-read schema mismatch repaired on explicitly user-approved TEST project `hyhvcnpbuakwaxoyenyw`**. The five directory-era migrations are now applied there. Real Supabase Auth/PostgREST, Next password sign-in/SSR/server actions, reviewed direct-doctor booking, replay/IDOR denial, detail reload and cancellation passed. Four-step EN/NE UI checks remain as below. Live Gemini, populated directory-origin end-to-end booking and independent-session races remain unverified. Earlier inspection/“no hosted changes” statements describe prior work, not the current approved test rollout. No production deployment, commit or push performed; clinical-review gate unchanged.
 
 ## Module 1 — implementation map (2026-11-15)
