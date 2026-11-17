@@ -1,5 +1,16 @@
 # Hospital promotional pop-ups
 
+## User-approved production demonstration (2026-11-17)
+
+The user explicitly requested a fictional demo on production after the initial implementation. It is live on Vercel project **saharacare3**, team `team_ivDrjfjscZBYiCacLqqGKxPJ`, project `prj_zJAmJKHQKJAsrrsnMocqjOwmnj6X`:
+
+- Public demo: **https://saharacare3.vercel.app/hospital-demo** (no sign-in/database access required).
+- Destination: **https://saharacare3.vercel.app/hospital-demo?details=1**, clearly fictional, no booking/payment and no destination popup.
+- Deployment `dpl_J5ND9RU6w7dDhR4xUVC1y5NxbwWL`, application commit `7183b2e4c0a811a91dcd618d00d0fbd8655b30d7`, READY with the production domain assigned. Built directly from the feature commit in the existing connected `cmswqw/saharacare` repository; the same feature commits are pushed to Codefest/PR #3. No PR merge was required or performed.
+- Three server-only nonsecret settings were added for production/preview: `HOSPITAL_PROMOTIONS_DEMO=true`, `HOSPITAL_PROMOTIONS_ALLOW_PRODUCTION_DEMO=true`, `HOSPITAL_PROMOTIONS_DEMO_URL=https://saharacare3.vercel.app/hospital-demo?details=1`. No credential, `.env.local`, Supabase row/schema, provider-verification state or legal approval was changed. Normal production stays empty when either demo flag is false.
+- PASS local typecheck, lint, 131 tests and production build. PASS `node tests/flows/promotions-live-browser.mjs https://saharacare3.vercel.app/hospital-demo`: actual public production page at 390x844, fictional label, no horizontal overflow, correct safe links, close/scroll restoration, reload rotation and working destination without another popup. A production screenshot was visually inspected. This check uses no auth substitutes, but it does not test real sign-in/clinical workflows or physical devices; no database writes were made.
+- Turn off either demo flag and redeploy to disable the fictional campaign. Existing clinical-review and provider-approval requirements are unchanged. Demo permission is not real medical-advertising clearance.
+
 ## Content and approval
 
 `lib/promotions/config.ts` is the centralized, server-owned configuration. It starts with **no approved records**, so production displays nothing. Authorized repository maintainers add/update records through code review using the existing GitHub permissions. No browser writes, new admin role/UI, database table, migration, credentials, advertising SDK or tracking system is introduced. The existing paid clinical directory is not repurposed as an ad database.
