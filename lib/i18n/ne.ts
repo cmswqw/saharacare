@@ -1,5 +1,10 @@
 export const ne = {
   appName: "सहाराकेयर",
+  hospitalDemoTitle: "अस्पताल प्रचारको डेमो",
+  hospitalDemoNotice: "यस प्रदर्शनका अस्पताल र चित्रहरू काल्पनिक हुन्। कुनै वास्तविक अस्पताल, चिकित्सकीय प्रस्ताव वा समर्थन जनाइएको छैन।",
+  hospitalDemoInstructions: "प्रचार जुनसुकै बेला बन्द गर्न सक्नुहुन्छ। अर्को काल्पनिक अस्पताल हेर्न यो पृष्ठ फेरि लोड गर्नुहोस्।",
+  hospitalDemoDetails: "यो उदाहरण पृष्ठ हो, अस्पतालको वेबसाइट होइन। यहाँ बुकिङ, चिकित्सा सेवा वा भुक्तानी उपलब्ध छैन।",
+  hospitalDemoAgain: "अर्को डेमो हेर्नुहोस्",
   hospitalPromotionLabel: "अस्पतालको प्रचार",
   hospitalPromotionVisit: "{name} हेर्नुहोस् (नयाँ ट्याब खुल्छ)",
   hospitalPromotionPrevious: "अघिल्लो तस्बिर",

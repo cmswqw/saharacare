@@ -22,7 +22,9 @@ Image space is reserved at 4:3 with contain sizing. A broken image becomes linke
 
 ## Development preview
 
-Set `HOSPITAL_PROMOTIONS_DEMO=true` **only in local development** and restart the Next development server. The flag is ignored in production regardless of value. Three visibly fictional hospitals rotate using authored local `/promotions/demo.svg`; `https://example.invalid/saharacare-demo` is a deliberately non-resolving sample destination, not a real hospital. Delete/reset the rotation storage key if starting the sequence over. No real-data seed or hosted changes are required.
+Set `HOSPITAL_PROMOTIONS_DEMO=true` in local development and restart the Next development server. The flag alone is ignored in production. Following explicit user approval for a deployed fictional demo, production additionally requires `HOSPITAL_PROMOTIONS_ALLOW_PRODUCTION_DEMO=true`. Both flags must be true; ordinary production remains empty by default. Set `HOSPITAL_PROMOTIONS_DEMO_URL` to the deployed HTTPS `/hospital-demo?details=1` URL so sample artwork/CTA opens the clearly fictional information page. Without that override the sample uses intentionally non-resolving `https://example.invalid/saharacare-demo`. Three visibly fictional hospitals rotate using authored local `/promotions/demo.svg`. No clinical verification or legal approval is inferred from these demo flags. Delete/reset the rotation storage key if starting the sequence over. No real-data seed or database changes are required.
+
+`/hospital-demo` is an explicitly public, data-free demonstration screen with the readiness marker; no sign-in is required there. `/hospital-demo?details=1` omits the readiness marker so following the CTA does not start another popup in the destination tab. Reload/See the next demo performs a fresh page load. Normal patient/doctor/caregiver authentication remains unchanged. Turn off either flag and redeploy to remove the fictional popups.
 
 Isolated preview without sign-in/backend calls:
 

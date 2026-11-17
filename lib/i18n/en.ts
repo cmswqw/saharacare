@@ -1,5 +1,10 @@
 export const en = {
   appName: "SaharaCare",
+  hospitalDemoTitle: "Hospital promotion demo",
+  hospitalDemoNotice: "All hospitals and artwork in this demonstration are fictional. No real hospital, medical offer or endorsement is represented.",
+  hospitalDemoInstructions: "Close the promotion at any time. Reload this page to see the next fictional hospital.",
+  hospitalDemoDetails: "This is an example destination, not a hospital website. No booking, medical service or payment is available here.",
+  hospitalDemoAgain: "See the next demo",
   hospitalPromotionLabel: "Hospital promotion",
   hospitalPromotionVisit: "Visit {name} (opens a new tab)",
   hospitalPromotionPrevious: "Previous image",

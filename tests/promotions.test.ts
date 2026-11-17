@@ -3,8 +3,14 @@ import assert from "node:assert/strict";
 import { eligiblePromotions, nextPromotion, readRotation, writeRotation } from "../lib/promotions/policy";
 import { loadServerModule } from "./server-module";
 const item = { id: "a", hospitalName: "DEMO fictional", imageUrl: "/promotions/demo.svg", destinationUrl: "https://example.invalid", isActive: true, priority: 1 };
-test("production never enables development samples, even when the flag is set", () => {
-  for (const [environment, expected] of [[{ NODE_ENV: "production", HOSPITAL_PROMOTIONS_DEMO: "true" }, 0], [{ NODE_ENV: "development", HOSPITAL_PROMOTIONS_DEMO: "true" }, 3], [{ NODE_ENV: "development" }, 0]] as const) {
+test("production samples require explicit production-demo permission as well as the demo flag", () => {
+  const cases: [Record<string, string>, number][] = [
+    [{ NODE_ENV: "production", HOSPITAL_PROMOTIONS_DEMO: "true" }, 0],
+    [{ NODE_ENV: "production", HOSPITAL_PROMOTIONS_ALLOW_PRODUCTION_DEMO: "true" }, 0],
+    [{ NODE_ENV: "production", HOSPITAL_PROMOTIONS_DEMO: "true", HOSPITAL_PROMOTIONS_ALLOW_PRODUCTION_DEMO: "true" }, 3],
+    [{ NODE_ENV: "development", HOSPITAL_PROMOTIONS_DEMO: "true" }, 3], [{ NODE_ENV: "development" }, 0],
+  ];
+  for (const [environment, expected] of cases) {
     const module = loadServerModule("lib/promotions/config.ts", {}, environment);
     assert.equal((module.getHospitalPromotions as () => unknown[])().length, expected);
   }
