@@ -34,6 +34,11 @@ export function isAppointmentTime(value: string) {
   return timePattern.test(value);
 }
 
+export function isAppointmentInstant(value: string) {
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value)
+    && Number.isFinite(Date.parse(value));
+}
+
 export function getKathmanduDateInputValue(value = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: APPOINTMENT_TIME_ZONE,

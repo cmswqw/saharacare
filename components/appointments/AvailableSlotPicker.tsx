@@ -10,6 +10,7 @@ import {
   getKathmanduDateInputValue,
 } from "@/lib/appointment-utils";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
 import type { AvailableAppointmentSlot } from "@/types";
 
 export function AvailableSlotPicker({
@@ -19,6 +20,8 @@ export function AvailableSlotPicker({
   selectedSlot,
   onSlotChange,
   idPrefix = "appointment",
+  loadSlots = getAvailableAppointmentSlotsAction,
+  refreshKey,
 }: {
   doctorId: string;
   date: string;
@@ -26,11 +29,14 @@ export function AvailableSlotPicker({
   selectedSlot: string;
   onSlotChange: (startsAt: string) => void;
   idPrefix?: string;
+  loadSlots?: typeof getAvailableAppointmentSlotsAction;
+  refreshKey?: number;
 }) {
   const { language, t } = useApp();
   const [slots, setSlots] = useState<AvailableAppointmentSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
   const minimumDate = useMemo(() => getKathmanduDateInputValue(), []);
   const maximumDate = useMemo(() => {
     const value = new Date(`${minimumDate}T00:00:00+05:45`);
@@ -43,17 +49,17 @@ export function AvailableSlotPicker({
     onSlotChange("");
     setSlots([]);
     setError(null);
-    if (!doctorId || !date) return () => { active = false; };
+    if (!doctorId || !date) { setLoading(false); return () => { active = false; }; }
 
     setLoading(true);
-    void getAvailableAppointmentSlotsAction(doctorId, date).then((response) => {
+    void loadSlots(doctorId, date).then((response) => {
       if (!active) return;
       setSlots(response.slots);
       setError(response.error);
       setLoading(false);
-    });
+    }).catch(() => { if (active) { setSlots([]); setError("unavailable"); setLoading(false); } });
     return () => { active = false; };
-  }, [date, doctorId, onSlotChange]);
+  }, [date, doctorId, onSlotChange, loadSlots, refreshKey, retry]);
 
   return (
     <div className="space-y-4">
@@ -69,11 +75,11 @@ export function AvailableSlotPicker({
           max={maximumDate}
           required
           onChange={(event) => onDateChange(event.target.value)}
-          className="min-h-14 w-full rounded-2xl border-2 bg-card px-4 text-base font-semibold focus:border-primary"
+          className="min-h-14 w-full min-w-0 rounded-2xl border-2 bg-card px-4 text-lg font-semibold focus:border-primary"
         />
       </div>
 
-      <fieldset>
+      <fieldset hidden={!date}>
         <legend className="mb-3 font-bold">{t("availableTimes")}</legend>
         <div aria-live="polite">
           {!doctorId ? (
@@ -85,9 +91,9 @@ export function AvailableSlotPicker({
               {t("loadingAvailableTimes")}
             </p>
           ) : error ? (
-            <p role="alert" className="rounded-2xl bg-red-50 p-4 font-bold text-red-800 dark:bg-red-950/30 dark:text-red-100">
+            <div role="alert" className="space-y-3 rounded-2xl bg-red-50 p-4 font-bold text-red-800 dark:bg-red-950/30 dark:text-red-100"><p>
               {t("availableTimesError")}
-            </p>
+            </p><Button type="button" variant="secondary" onClick={() => setRetry(value => value + 1)}>{t("bookingRetry")}</Button></div>
           ) : date && slots.length === 0 ? (
             <p className="rounded-2xl bg-slate-50 p-4 text-muted dark:bg-slate-900">
               {t("noAvailableTimes")}

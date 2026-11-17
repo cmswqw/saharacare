@@ -15,11 +15,13 @@ export function MarkDoseTakenButton({
   status,
   takenAt,
   large = false,
+  compact = false,
 }: {
   doseId: string;
   status: DoseStatus;
   takenAt: string | null;
   large?: boolean;
+  compact?: boolean;
 }) {
   const { language, t } = useApp();
   const [state, formAction, pending] = useActionState(
@@ -44,11 +46,11 @@ export function MarkDoseTakenButton({
         <Button
           type="submit"
           size={large ? "large" : "default"}
-          className={large ? "w-full" : ""}
+          className={large ? "w-full" : compact ? "px-4 text-sm" : ""}
           disabled={pending}
         >
           <Pill className="rotate-45" />
-          {t(pending ? "saving" : "markAsTaken")}
+          {t(pending ? "saving" : compact ? "iTookIt" : "markAsTaken")}
         </Button>
       </form>
       {state.status === "error" ? (

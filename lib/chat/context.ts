@@ -93,7 +93,7 @@ export async function getAuthenticatedChatActor(
   };
 }
 
-async function resolveChatSubject(
+export async function resolveChatSubject(
   supabase: ServerSupabaseClient,
   actor: ChatActor,
   requestedPatientId: string | null,

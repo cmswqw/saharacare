@@ -37,7 +37,7 @@ body {
   background-image:
     radial-gradient(circle at 100% 0%, rgba(47, 160, 149, 0.08), transparent 26rem),
     linear-gradient(180deg, rgb(var(--background)), rgb(var(--background)));
-  font-family: Arial, var(--font-devanagari), system-ui, sans-serif;
+  font-family: var(--font-sans), var(--font-devanagari), system-ui, sans-serif;
   text-rendering: optimizeLegibility;
 }
 

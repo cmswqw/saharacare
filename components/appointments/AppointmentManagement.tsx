@@ -79,6 +79,7 @@ export function AppointmentManagement({
             selectedSlot={selectedSlot}
             onSlotChange={selectSlot}
             idPrefix={`reschedule-${appointmentId}`}
+            refreshKey={rescheduleState.status === "error" ? rescheduleState.nonce : undefined}
           />
           <input type="hidden" name="startsAt" value={selectedSlot} />
           {rescheduleState.status === "error" ? (

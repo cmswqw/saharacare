@@ -2,16 +2,19 @@ import { CircleAlert, Pill } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { TranslatedText } from "@/components/ui/TranslatedText";
 import type { TranslationKey } from "@/lib/i18n";
+import { RetryDataButton } from "@/components/ui/RetryDataButton";
 
 export function DataErrorState({
   message,
   messageKey,
+  retry = false,
 }: {
   message?: string;
   messageKey?: TranslationKey;
+  retry?: boolean;
 }) {
   return (
-    <Card className="border-red-200 bg-red-50 p-6 dark:bg-red-950/20">
+    <Card role="alert" className="border-red-200 bg-red-50 p-6 dark:bg-red-950/20">
       <div className="flex items-start gap-4">
         <CircleAlert className="mt-0.5 h-7 w-7 shrink-0 text-danger" />
         <div>
@@ -19,6 +22,7 @@ export function DataErrorState({
           <p className="mt-2 leading-relaxed text-muted">
             {messageKey ? <TranslatedText translationKey={messageKey} /> : message}
           </p>
+          {retry ? <RetryDataButton /> : null}
         </div>
       </div>
     </Card>

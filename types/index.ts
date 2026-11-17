@@ -143,6 +143,11 @@ export type AppointmentStatus = "requested" | "confirmed" | "completed" | "cance
 export type AppointmentActorRole = "patient" | "caregiver";
 
 export type Appointment = {
+  directory_affiliation_id?: string | null;
+  directory_specialty_id?: string | null;
+  booked_fee_amount?: number | null;
+  booked_currency?: string | null;
+  booking_time_zone?: string | null;
   id: string;
   patient_id: string;
   doctor_id: string;

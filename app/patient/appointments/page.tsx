@@ -4,6 +4,6 @@ import { getAppointments, getDoctors } from "@/lib/data/appointments";
 
 export default async function AppointmentsPage() {
   const [appointments, doctors] = await Promise.all([getAppointments(), getDoctors()]);
-  if (appointments.error || doctors.error) return <DataErrorState messageKey="appointmentsError" />;
+  if (appointments.error || doctors.error) return <DataErrorState messageKey="appointmentsError" retry />;
   return <PatientAppointmentsView appointments={appointments.data} doctors={doctors.data} />;
 }

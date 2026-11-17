@@ -9,6 +9,7 @@ import type { CaregiverChatSubject } from "@/lib/chat/context";
 import type { UserRole } from "@/types";
 import { useApp } from "@/components/providers/AppProvider";
 import type { TranslationKey } from "@/lib/i18n";
+import Link from "next/link";
 
 type DisplayMessage = ChatMessage & {
   id: string;
@@ -232,6 +233,10 @@ export function ChatAssistant({
           ) : null}
         </label>
       ) : null}
+
+      <Card className="space-y-3 p-4"><h2 className="font-bold">{t("guidanceTitle")}</h2><p className="text-sm text-muted">{t("bookingHelperLinkHelp")}</p>
+        {viewerRole === "caregiver" && !selectedPatientId ? <Button disabled>{t("bookingOpenHelper")}</Button> : <Button asChild><Link href={viewerRole === "caregiver" ? `/caregiver/patient/${selectedPatientId}#booking-helper` : "/patient/appointments#booking-helper"}>{t("bookingOpenHelper")}</Link></Button>}
+      </Card>
 
       <Card className="overflow-hidden">
         <div

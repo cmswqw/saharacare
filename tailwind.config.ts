@@ -43,7 +43,7 @@ const config: Config = {
       borderRadius: { xl: "0.875rem", "2xl": "1.125rem", "3xl": "1.375rem" },
       boxShadow: { soft: "0 12px 32px rgba(8, 52, 48, 0.07)" },
       fontFamily: {
-        sans: ["Arial", "var(--font-devanagari)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "var(--font-devanagari)", "system-ui", "sans-serif"],
       },
     },
   },

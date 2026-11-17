@@ -7,11 +7,14 @@ import {
   isAppointmentDate,
   isAppointmentTime,
   isAppointmentUuid,
+  isAppointmentInstant,
 } from "@/lib/appointment-utils";
 import { createClient } from "@/lib/supabase/server";
+import { parseBookingReview, parseDirectoryBookingQuote, isSpecialtyId, type BookingReview, type DirectoryBookingQuote, type DirectoryBookingSelection } from "@/lib/directory/booking";
 import type {
   AvailableAppointmentSlot,
   UserRole,
+  AppointmentStatus,
 } from "@/types";
 
 export type AppointmentActionState = {
@@ -19,6 +22,8 @@ export type AppointmentActionState = {
   message: string;
   appointmentId?: string;
   nonce?: number;
+  appointmentStatus?: AppointmentStatus;
+  errorCode?: "conflict" | "stale" | "invalid" | "unavailable";
 };
 
 export type AvailableSlotsState = {
@@ -43,6 +48,7 @@ type AppointmentBookingInput = {
   facility: string;
   purpose: string;
   note: string | null;
+  review?: BookingReview;
 };
 
 const idleError = "The appointment could not be updated. Please try again.";
@@ -126,10 +132,12 @@ async function createAppointmentForActor(
     appointment_facility: input.facility,
     appointment_purpose: input.purpose,
     appointment_note: input.note,
+    ...(input.review ? { booking_review: input.review } : {}),
   });
 }
 
 function appointmentError(error: { code?: string; message?: string }) {
+  if (error.code === "P0001") return "Listing or fee changed. Review current details before rescheduling.";
   if (error.code === "23P01" || error.code === "23505") {
     return "That time is no longer available. Choose another free slot.";
   }
@@ -228,11 +236,17 @@ export async function bookAppointmentAction(
   const facility = String(formData.get("facility") ?? "").trim();
   const purpose = String(formData.get("purpose") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
+  let review: BookingReview | undefined;
+  const rawReview = formData.get("bookingReview");
+  if (rawReview !== null) {
+    try { review = parseBookingReview(JSON.parse(String(rawReview))) ?? undefined; } catch { /* Invalid input fails closed. */ }
+    if (!review) return { ...result("error", "Review and confirm the current booking details."), errorCode: "invalid" };
+  }
 
   if (
     !isAppointmentUuid(doctorId)
     || !isAppointmentUuid(patientId)
-    || !Number.isFinite(Date.parse(startsAt))
+    || !isAppointmentInstant(startsAt)
     || !facility
     || facility.length > 200
     || !purpose
@@ -251,24 +265,53 @@ export async function bookAppointmentAction(
       facility,
       purpose,
       note: note || null,
+      review,
     },
   );
   if (error) {
     logMutationError("book_appointment_failed", error);
-    return result("error", appointmentError(error));
+    return { ...result("error", error.code === "P0001" ? "Listing or fee changed. Refresh and review the current details." : appointmentError(error)),
+      errorCode: ["23P01", "23505"].includes(error.code) ? "conflict" : error.code === "P0001" ? "stale" : "unavailable" };
   }
-  if (typeof data !== "string" || !isAppointmentUuid(data)) {
+  const appointmentId = typeof data === "string" ? data : data?.appointment_id;
+  const appointmentStatus = typeof data === "object" && data ? data.status as AppointmentStatus : "requested";
+  if (typeof appointmentId !== "string" || !isAppointmentUuid(appointmentId)
+    || !["requested", "confirmed", "completed", "cancelled"].includes(appointmentStatus)) {
     return result("error", "Supabase did not confirm the appointment.");
   }
 
-  await notifyPatientAfterCaregiverAction(
+  if (!data?.replayed) await notifyPatientAfterCaregiverAction(
     actorContext.supabase,
     actorContext.actor,
-    data,
+    appointmentId,
     "appointment_booked",
   );
   revalidateAppointmentPaths();
-  return result("success", "Appointment booked successfully.", data);
+  return { ...result("success", "Appointment request saved.", appointmentId), appointmentStatus };
+}
+
+export async function getDirectoryBookingSlotsAction(
+  selection: DirectoryBookingSelection, date: string, requestedPatientId = "",
+): Promise<AvailableSlotsState & { quote: DirectoryBookingQuote | null }> {
+  const context = await getActionActor(["patient", "caregiver"]);
+  if (!context.actor) return { slots: [], quote: null, error: context.error ?? idleError };
+  if (!selection || typeof selection !== "object" || !isAppointmentUuid(selection.providerId) || !isAppointmentUuid(selection.affiliationId) || !isSpecialtyId(selection.specialtyId) || !isAppointmentDate(date)) {
+    return { slots: [], quote: null, error: "Choose a current listing and date." };
+  }
+  const subject = await resolveBookingPatientId({ supabase: context.supabase, actor: context.actor }, requestedPatientId);
+  if (!subject.patientId) return { slots: [], quote: null, error: subject.error ?? idleError };
+  const { data, error } = await context.supabase.rpc("get_directory_booking_slots", {
+    provider_id: selection.providerId, affiliation_id: selection.affiliationId, specialty_id: selection.specialtyId,
+    appointment_date: date, requested_patient_id: subject.patientId,
+  });
+  const quote = error ? null : parseDirectoryBookingQuote(data?.quote);
+  if (!quote || quote.providerId !== selection.providerId || quote.affiliationId !== selection.affiliationId || quote.specialtyId !== selection.specialtyId || !Array.isArray(data?.slots)) {
+    return { slots: [], quote: null, error: "The listing or availability could not be verified. Refresh the listing." };
+  }
+  const slots = data.slots.flatMap((slot: Record<string, unknown>) => typeof slot.starts_at === "string" && typeof slot.ends_at === "string"
+    && Number.isFinite(Date.parse(slot.starts_at)) && Date.parse(slot.ends_at) - Date.parse(slot.starts_at) === 30 * 60_000
+    ? [{ starts_at: slot.starts_at, ends_at: slot.ends_at }] : []);
+  return { slots, quote, error: null };
 }
 
 export async function requestAppointmentAction(
@@ -287,7 +330,7 @@ export async function rescheduleAppointmentAction(
 
   const appointmentId = String(formData.get("appointmentId") ?? "");
   const startsAt = String(formData.get("startsAt") ?? "");
-  if (!isAppointmentUuid(appointmentId) || !Number.isFinite(Date.parse(startsAt))) {
+  if (!isAppointmentUuid(appointmentId) || !isAppointmentInstant(startsAt)) {
     return result("error", "Choose a valid free time.");
   }
 

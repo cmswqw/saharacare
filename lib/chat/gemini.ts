@@ -34,6 +34,8 @@ export type ChatProviderInput = {
   systemInstruction: string;
   maxOutputTokens: number;
   signal: AbortSignal;
+  /** Opt-in JSON output; existing free-text chat remains unchanged. */
+  responseJsonSchema?: Record<string, unknown>;
 };
 
 export function getChatProviderMetadata() {
@@ -63,6 +65,7 @@ export function getChatProvider() {
           systemInstruction: input.systemInstruction,
           maxOutputTokens: input.maxOutputTokens,
           safetySettings,
+          ...(input.responseJsonSchema ? { responseMimeType: "application/json", responseJsonSchema: input.responseJsonSchema } : {}),
           abortSignal: input.signal,
           httpOptions: {
             timeout: GEMINI_TIMEOUT_MS,

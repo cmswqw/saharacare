@@ -19,6 +19,7 @@ import { checkChatRateLimit } from "@/lib/chat/rate-limit";
 import { getDeterministicSafetyReply } from "@/lib/chat/safety";
 import { createClient } from "@/lib/supabase/server";
 import { readBoundedJson, RequestBodyError } from "@/lib/request-body";
+import { handleBookingGuidance } from "@/lib/chat/booking-guidance";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -97,6 +98,11 @@ export async function POST(request: Request) {
       return textResponse("The chat request is too large.", 413, requestId);
     }
     return textResponse("The chat request is invalid.", 400, requestId);
+  }
+
+  // Explicit mode keeps the existing text-stream contract unchanged.
+  if (rawPayload && typeof rawPayload === "object" && "mode" in rawPayload && rawPayload.mode === "booking_guidance") {
+    return handleBookingGuidance(request, rawPayload, requestId);
   }
 
   const parsed = parseChatRequest(rawPayload);

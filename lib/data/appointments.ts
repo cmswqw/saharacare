@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile, requireRole } from "@/lib/auth";
+import { safeDatabaseDiagnostic } from "@/lib/security-diagnostics";
 import type {
   Appointment,
   AppointmentActorRole,
@@ -14,7 +15,24 @@ import type {
 
 type ProfileRelation = { full_name: string } | { full_name: string }[] | null;
 
+function readError(error: { code?: string; message?: string } | null, status: number, operation: string) {
+  if (!error) return null;
+  // Free-text DB messages/hints may contain patient data. Log only codes and a
+  // known schema marker, never rows, patient IDs, filters, cookies or raw errors.
+  const missingBookingColumn = error.code === "42703" && ["directory_affiliation_id", "directory_specialty_id", "booked_fee_amount", "booked_currency", "booking_time_zone"].some(column => error.message?.includes(column));
+  console.error("[saharacare-appointments]", { event: "read_failed", operation,
+    ...safeDatabaseDiagnostic(error), httpStatus: Number.isInteger(status) && status >= 100 && status <= 599 ? status : null,
+    ...(missingBookingColumn ? { schemaIssue: "missing_booking_snapshot_columns", requiredMigration: "20261115061354_integrate_safe_directory_booking.sql" } : {}),
+  });
+  return "Appointment information could not be loaded.";
+}
+
 type AppointmentRow = {
+  directory_affiliation_id: string | null;
+  directory_specialty_id: string | null;
+  booked_fee_amount: number | null;
+  booked_currency: string | null;
+  booking_time_zone: string | null;
   id: string;
   patient_id: string;
   doctor_id: string;
@@ -36,6 +54,11 @@ type AppointmentRow = {
 };
 
 const appointmentSelection = `
+  directory_affiliation_id,
+  directory_specialty_id,
+  booked_fee_amount,
+  booked_currency,
+  booking_time_zone,
   id,
   patient_id,
   doctor_id,
@@ -63,6 +86,11 @@ function relationName(value: ProfileRelation) {
 
 function mapAppointment(row: AppointmentRow): Appointment {
   return {
+    directory_affiliation_id: row.directory_affiliation_id,
+    directory_specialty_id: row.directory_specialty_id,
+    booked_fee_amount: row.booked_fee_amount,
+    booked_currency: row.booked_currency,
+    booking_time_zone: row.booking_time_zone,
     id: row.id,
     patient_id: row.patient_id,
     doctor_id: row.doctor_id,
@@ -91,13 +119,13 @@ export async function getDoctors() {
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
     .from("profiles")
     .select("id, full_name")
     .eq("role", "doctor")
     .eq("account_status", "active")
     .order("full_name");
-  return { data: data ?? [], error: error?.message ?? null };
+  return { data: data ?? [], error: readError(error, status, "doctors") };
 }
 
 export async function getAppointments(patientId?: string) {
@@ -105,26 +133,26 @@ export async function getAppointments(patientId?: string) {
   const supabase = await createClient();
 
   if (profile.role === "doctor") {
-    const { data, error } = await supabase
+    const { data, error, status } = await supabase
       .from("appointments")
       .select(appointmentSelection)
       .eq("doctor_id", profile.id)
       .order("starts_at", { ascending: true });
     return {
       data: ((data ?? []) as unknown as AppointmentRow[]).map(mapAppointment),
-      error: error?.message ?? null,
+      error: readError(error, status, "doctor_appointments"),
     };
   }
 
   if (profile.role === "patient") {
-    const { data, error } = await supabase
+    const { data, error, status } = await supabase
       .from("appointments")
       .select(appointmentSelection)
       .eq("patient_id", profile.id)
       .order("starts_at", { ascending: true });
     return {
       data: ((data ?? []) as unknown as AppointmentRow[]).map(mapAppointment),
-      error: error?.message ?? null,
+      error: readError(error, status, "patient_appointments"),
     };
   }
 
@@ -135,7 +163,7 @@ export async function getAppointments(patientId?: string) {
     };
   }
 
-  const { data: link, error: linkError } = await supabase
+  const { data: link, error: linkError, status: linkStatus } = await supabase
     .from("caregiver_links")
     .select("id")
     .eq("caregiver_id", profile.id)
@@ -145,18 +173,18 @@ export async function getAppointments(patientId?: string) {
   if (linkError || !link) {
     return {
       data: [],
-      error: linkError?.message ?? "This patient is not linked to your account.",
+      error: readError(linkError, linkStatus, "caregiver_link") ?? "This patient is not linked to your account.",
     };
   }
 
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
     .from("appointments")
     .select(appointmentSelection)
     .eq("patient_id", patientId)
     .order("starts_at", { ascending: true });
   return {
     data: ((data ?? []) as unknown as AppointmentRow[]).map(mapAppointment),
-    error: error?.message ?? null,
+    error: readError(error, status, "caregiver_appointments"),
   };
 }
 
@@ -171,7 +199,7 @@ export async function getAppointment(appointmentId: string) {
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
     .from("appointments")
     .select(appointmentSelection)
     .eq("id", appointmentId)
@@ -180,12 +208,12 @@ export async function getAppointment(appointmentId: string) {
     return {
       data: null,
       share: null,
-      error: error?.message ?? "Appointment not found.",
+      error: readError(error, status, "appointment_detail") ?? "Appointment not found.",
     };
   }
 
   const appointment = mapAppointment(data as unknown as AppointmentRow);
-  const { data: shares, error: shareError } = await supabase
+  const { data: shares, error: shareError, status: shareStatus } = await supabase
     .from("appointment_medical_shares")
     .select("id, appointment_id, expires_at, revoked_at, created_at, appointment_medical_files(id, share_id, original_filename, mime_type, size_bytes, kind, created_at)")
     .eq("appointment_id", appointmentId)
@@ -207,7 +235,7 @@ export async function getAppointment(appointmentId: string) {
     created_at: rawShare.created_at,
     files: rawShare.appointment_medical_files ?? [],
   } : null;
-  return { data: appointment, share, error: shareError?.message ?? null };
+  return { data: appointment, share, error: readError(shareError, shareStatus, "appointment_shares") };
 }
 
 export async function getDoctorAvailability() {

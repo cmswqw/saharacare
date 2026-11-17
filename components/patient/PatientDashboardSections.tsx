@@ -26,15 +26,15 @@ export function TodayProgressCard({ doses }: { doses: TodayDose[] }) {
   const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   return (
-    <Card className="h-full p-5 md:p-6">
-      <div className="flex items-center justify-between gap-3">
+    <Card className="h-full min-w-0 p-5 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div><p className="eyebrow">{t("today")}</p><h2 className="mt-1 text-2xl font-extrabold">{t("todaysProgress")}</h2></div>
         <strong className="text-2xl text-primary">{progress}%</strong>
       </div>
       <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800" aria-label={t("progressPercent", { percent: progress })}>
         <div className="h-full rounded-full bg-success transition-[width]" style={{ width: `${progress}%` }} />
       </div>
-      <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+      <div className="mt-5 grid grid-cols-3 gap-2 break-words text-center">
         <div className="rounded-2xl bg-green-50 p-3 dark:bg-green-950/30"><Check className="mx-auto text-success" /><strong className="mt-1 block text-xl">{counts.taken}</strong><span className="text-sm text-muted">{t("taken")}</span></div>
         <div className="rounded-2xl bg-blue-50 p-3 dark:bg-blue-950/30"><Clock3 className="mx-auto text-primary" /><strong className="mt-1 block text-xl">{counts.scheduled}</strong><span className="text-sm text-muted">{t("upcoming")}</span></div>
         <div className="rounded-2xl bg-amber-50 p-3 dark:bg-amber-950/30"><TriangleAlert className="mx-auto text-amber-700" /><strong className="mt-1 block text-xl">{counts.late + counts.missed}</strong><span className="text-sm text-muted">{t("needsAttention")}</span></div>
@@ -51,10 +51,10 @@ export function UpcomingRemindersCard({ doses }: { doses: TodayDose[] }) {
     .slice(0, 3);
 
   return (
-    <Card className="h-full p-5 md:p-6">
-      <div className="flex items-center justify-between gap-3">
+    <Card className="h-full min-w-0 p-5 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div><p className="eyebrow">{t("medicineReminders")}</p><h2 className="mt-1 text-2xl font-extrabold">{t("upcomingToday")}</h2></div>
-        <Link href="#today-schedule" className="font-bold text-primary hover:underline">{t("viewSchedule")}</Link>
+        <Link href={doses.length > 0 ? "#today-schedule" : "/patient/medicines"} className="inline-flex min-h-11 items-center text-sm font-bold text-primary hover:underline">{t("viewSchedule")}</Link>
       </div>
       {upcoming.length === 0 ? (
         <p className="mt-5 rounded-2xl bg-slate-50 p-4 text-muted dark:bg-slate-900">{t(doses.length === 0 ? "noDosesToday" : "noUpcomingDoses")}</p>
@@ -80,7 +80,7 @@ export function CaregiverStatusCard({ links }: { links: LinkedCaregiver[] }) {
   const firstName = accepted[0]?.caregiver?.full_name;
 
   return (
-    <Card className="h-full p-5 md:p-6">
+    <Card className="h-full min-w-0 p-5 md:p-6">
       <div className="flex items-start gap-4">
         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-green-50 text-success dark:bg-green-950/30"><ShieldCheck aria-hidden="true" /></span>
         <div className="min-w-0 flex-1"><p className="eyebrow">{t("caregiverAccess")}</p><h2 className="mt-1 text-2xl font-extrabold">{accepted.length > 0 ? t("caregiverConnected") : t("caregiverNotConnected")}</h2></div>
@@ -108,21 +108,18 @@ export function QuickActionsCard() {
   ];
 
   return (
-    <Card className="min-w-0 p-5 md:p-6">
-      <div>
-        <p className="eyebrow">{t("shortcuts")}</p>
-        <h2 className="mt-1 text-2xl font-extrabold">{t("quickActions")}</h2>
-      </div>
-      <div className="mt-5 grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+    <Card className="min-w-0 rounded-xl p-3 sm:p-4">
+      <h2 className="text-base font-extrabold tracking-tight sm:text-lg">{t("careServices")}<span className="sr-only"> · {t("quickActions")}</span></h2>
+      <div className="mt-2 grid grid-cols-3 gap-x-1 gap-y-2 sm:gap-3 xl:grid-cols-5">
         {actions.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
-            className="flex min-h-28 min-w-0 w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/45 px-3 py-4 text-center text-base font-extrabold leading-tight whitespace-normal break-words [overflow-wrap:anywhere] transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-blue-50 hover:shadow-soft focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 active:translate-y-0 motion-reduce:transform-none sm:min-h-32 sm:px-4 sm:text-lg dark:bg-blue-950/20 dark:hover:bg-blue-950/40"
+            className="flex min-h-[88px] min-w-0 w-full flex-col items-center justify-start gap-1.5 rounded-xl px-0.5 py-1.5 text-center text-sm font-bold leading-tight whitespace-normal break-words [overflow-wrap:anywhere] transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 sm:px-2 dark:hover:bg-blue-950/40"
             aria-label={t(label)}
           >
-            <span className="icon-tile bg-card shadow-sm"><Icon className="h-6 w-6 shrink-0" aria-hidden="true" /></span>
-            <span className="max-w-full">{t(label)}</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-primary dark:bg-blue-950"><Icon className="h-6 w-6 shrink-0" strokeWidth={1.7} aria-hidden="true" /></span>
+            <span className="max-w-full hyphens-auto leading-snug">{t(label)}</span>
           </Link>
         ))}
       </div>

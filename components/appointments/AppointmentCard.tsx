@@ -45,6 +45,8 @@ export function AppointmentCard({
       <p className="flex items-center gap-2 font-bold"><CalendarDays className="text-primary" aria-hidden="true" />{formatAppointmentDate(appointment.starts_at, language)}</p>
       <p className="flex items-center gap-2 font-bold"><Clock3 className="text-primary" aria-hidden="true" />{formatAppointmentTime(appointment.starts_at, language)}</p>
       <p className="text-muted sm:col-span-2">{purposeKey ? t(purposeKey) : appointment.purpose}</p>
+      <p className="text-sm text-muted sm:col-span-2">{appointment.booking_time_zone ?? "Asia/Kathmandu"}</p>
+      {appointment.directory_affiliation_id ? <p className="text-sm sm:col-span-2">{t("guidanceFee")}: {appointment.booked_fee_amount == null ? t("guidanceFeeUnknown") : `${appointment.booked_currency} ${appointment.booked_fee_amount}`}</p> : null}
       {appointment.created_by_role === "caregiver" ? (
         <p className="flex items-center gap-2 font-semibold text-muted sm:col-span-2">
           <UsersRound className="text-primary" aria-hidden="true" />

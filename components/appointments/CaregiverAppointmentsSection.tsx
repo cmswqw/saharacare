@@ -8,6 +8,7 @@ import { useApp } from "@/components/providers/AppProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { Appointment } from "@/types";
+import { BookingGuidance } from "@/components/chat/BookingGuidance";
 
 export function CaregiverAppointmentsSection({
   patient,
@@ -32,16 +33,18 @@ export function CaregiverAppointmentsSection({
         </div>
         <Button
           type="button"
+          variant="secondary"
           size="large"
           className="w-full sm:w-auto"
           aria-expanded={showBooking}
           onClick={() => setShowBooking((current) => !current)}
         >
           <CalendarPlus aria-hidden="true" />
-          {t(showBooking ? "closeBookingForm" : "bookAppointment")}
+          {t(showBooking ? "closeBookingForm" : "bookingOtherDoctor")}
         </Button>
       </div>
 
+      <section id="booking-helper" hidden={showBooking} className="scroll-mt-24 min-w-0" aria-label={t("guidanceTitle")}><BookingGuidance key={patient.id} patientId={patient.id} patientName={patient.full_name} disabled={false} /></section>
       {showBooking ? (
         <Card className="p-5 md:p-7">
           <AppointmentRequestForm doctors={doctors} mode="caregiver" patient={patient} />

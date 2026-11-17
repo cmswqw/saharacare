@@ -40,10 +40,10 @@ export function loadServerModule(
         throw new Error(`Unmocked test dependency: ${specifier}`);
       },
       process: { env: { ...environment } },
-      Response, Request, File, Blob, FormData, Headers, URL,
+      Response, Request, ReadableStream, File, Blob, FormData, Headers, URL,
       Uint8Array, ArrayBuffer, TextEncoder, TextDecoder,
       Date, Error, TypeError, RangeError, crypto,
-      console: { error() { throw new Error("Unexpected server logging in test."); } },
+      console: mocks["test:console"] ?? { error() { throw new Error("Unexpected server logging in test."); } },
     }, { filename });
     return module.exports;
   }
